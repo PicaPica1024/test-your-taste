@@ -26,6 +26,7 @@ export function GameApp() {
   const [stats, setStats] = useState<SessionStats>(emptyStats);
   const [shownIds, setShownIds] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const roundRef = useRef<Round | null>(null);
   const revealedRef = useRef(false);
@@ -131,6 +132,7 @@ export function GameApp() {
     setRevealed(false);
     setJournalGuess(null);
     setCitationGuess(null);
+    setErrorMessage(null);
     try {
       const response = await fetch("/api/paper", {
         method: "POST",
@@ -138,13 +140,26 @@ export function GameApp() {
         body: JSON.stringify({ discipline: target.slug, excludedIds: shownIdsRef.current }),
         signal: controller.signal,
       });
-      const payload = (await response.json()) as Round | { error: string };
-      if (!response.ok || "error" in payload) throw new Error("Retrieval failed");
+      const payload = (await response.json()) as Round | { error?: string };
+      if (!response.ok || !("paper" in payload)) {
+        throw new Error(
+          "error" in payload && payload.error
+            ? payload.error
+            : "The paper request failed. Please try again.",
+        );
+      }
       setRound(payload);
       setShownIds((current) => [...current, payload.paper.id].slice(-100));
       setScreen("playing");
     } catch (error) {
-      if ((error as Error).name !== "AbortError") setScreen("error");
+      if ((error as Error).name !== "AbortError") {
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : "The paper request failed. Please try again.",
+        );
+        setScreen("error");
+      }
     }
   }
 
@@ -205,7 +220,7 @@ export function GameApp() {
             <div>
               <p className="mb-3 text-sm font-bold uppercase tracking-[0.15em] text-accent-strong">Retrieval paused</p>
               <h1 className="font-serif text-4xl text-ink">Couldn&apos;t find a suitable paper.</h1>
-              <p className="mt-4 text-base leading-7 text-ink-muted">The source may be busy, or this field needs another sample. Nothing was added to your score.</p>
+              <p className="mt-4 text-base leading-7 text-ink-muted">{errorMessage ?? "The source may be busy, or this field needs another sample."} Nothing was added to your score.</p>
               <div className="mt-7 flex justify-center gap-3">
                 <Button variant="outline" className="rounded-none" onClick={changeField}>Change Field</Button>
                 <Button className="rounded-none bg-accent-strong text-white hover:bg-ink" onClick={() => loadPaper()}>Try Again</Button>

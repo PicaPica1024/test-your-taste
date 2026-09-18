@@ -37,18 +37,101 @@ type ApiList<T> = { results?: T[] };
 const API = "https://api.openalex.org";
 const topicCache = new Map<string, OpenAlexTopic>();
 
-async function openAlexFetch<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${API}${path}`, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "TestYourTaste/0.1 (scholarly game MVP)",
-    },
-    signal,
-  });
-  if (!response.ok) {
-    throw new Error(`OpenAlex returned ${response.status}`);
+export type OpenAlexErrorCode =
+  | "OPENALEX_KEY_MISSING"
+  | "OPENALEX_AUTH_FAILED"
+  | "OPENALEX_RATE_LIMITED"
+  | "OPENALEX_UPSTREAM_ERROR";
+
+export class OpenAlexError extends Error {
+  constructor(
+    message: string,
+    readonly code: OpenAlexErrorCode,
+    readonly status?: number,
+  ) {
+    super(message);
+    this.name = "OpenAlexError";
   }
-  return response.json() as Promise<T>;
+}
+
+function requestUrl(path: string) {
+  const url = new URL(path, API);
+  const apiKey = process.env.OPENALEX_API_KEY?.trim();
+
+  // OpenAlex only grants a tiny shared allowance to keyless traffic. That is
+  // useful for local experiments, but Cloudflare egress exhausts it quickly in
+  // production because many applications can share the same public IP.
+  if (apiKey) {
+    url.searchParams.set("api_key", apiKey);
+  } else if (process.env.NODE_ENV === "production") {
+    throw new OpenAlexError(
+      "OPENALEX_API_KEY is not configured",
+      "OPENALEX_KEY_MISSING",
+    );
+  }
+
+  return url;
+}
+
+function retryDelay(response: Response, attempt: number) {
+  const retryAfter = Number(response.headers.get("Retry-After"));
+  if (Number.isFinite(retryAfter) && retryAfter > 0) {
+    return Math.min(retryAfter * 1_000, 4_000);
+  }
+  return 250 * 2 ** attempt;
+}
+
+async function pause(milliseconds: number, signal?: AbortSignal) {
+  if (signal?.aborted) throw signal.reason;
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, milliseconds);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      },
+      { once: true },
+    );
+  });
+}
+
+async function openAlexFetch<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const url = requestUrl(path);
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "TestYourTaste/0.1 (scholarly game MVP)",
+      },
+      signal,
+    });
+    if (response.ok) return response.json() as Promise<T>;
+
+    const retryable = response.status === 429 || response.status >= 500;
+    if (retryable && attempt < 2) {
+      await pause(retryDelay(response, attempt), signal);
+      continue;
+    }
+
+    const code: OpenAlexErrorCode =
+      response.status === 401 || response.status === 403 || response.status === 409
+        ? "OPENALEX_AUTH_FAILED"
+        : response.status === 429
+          ? "OPENALEX_RATE_LIMITED"
+          : "OPENALEX_UPSTREAM_ERROR";
+    throw new OpenAlexError(
+      `OpenAlex returned HTTP ${response.status}`,
+      code,
+      response.status,
+    );
+  }
+
+  throw new OpenAlexError(
+    "OpenAlex request failed after retries",
+    "OPENALEX_UPSTREAM_ERROR",
+  );
 }
 
 function topicScore(topic: OpenAlexTopic, term: string) {

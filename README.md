@@ -6,10 +6,11 @@ Test Your Taste is a minimal scientific judgment game. Pick a field, read the ye
 
 - Next.js / Vinext, React, and TypeScript
 - Tailwind CSS
-- OpenAlex Topics and Works APIs
+- OpenAlex Topics and Works APIs (API key required in production)
 - Browser `localStorage` for session statistics and duplicate prevention
 
-No database, account, API key, or private credential is required.
+No database or player account is required. OpenAlex now requires an API key for
+production use; free keys are available from the OpenAlex account settings.
 
 ## Run locally
 
@@ -21,6 +22,10 @@ npm run dev
 ```
 
 Open the local URL printed by the development server. A network connection is required while playing because papers and citation counts are retrieved from OpenAlex.
+
+Local development may use OpenAlex's small anonymous testing allowance. For a
+production deployment, configure `OPENALEX_API_KEY` as a secret environment
+variable. Do not commit the key to the repository or expose it to client code.
 
 For a production build:
 
@@ -48,6 +53,6 @@ The reputation tiers are editorial approximations for option ordering. They are 
 
 - OpenAlex topic classification, abstract coverage, and citation counts can contain source-data errors or omissions.
 - Journal distractors come from curated field-family pools; very niche papers may have less precise alternatives.
-- The game depends on OpenAlex availability and its unauthenticated API allowance.
+- The game depends on OpenAlex availability and the configured API key's daily allowance.
 - Statistics and seen-paper IDs are device-local and limited to the current browser.
 - The current answer is kept in transient client state after retrieval so the no-database MVP can reveal instantly; it is hidden by the interface until submission but is not an anti-cheat system.
