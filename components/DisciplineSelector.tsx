@@ -1,22 +1,7 @@
 "use client";
 
-import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxGroup,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxLabel,
-  ComboboxList,
-} from "@/components/ui/combobox";
 import { Button } from "@/components/ui/button";
-import {
-  disciplineGroups,
-  disciplines,
-  type Discipline,
-} from "@/config/disciplines";
-import { openAlexMappings } from "@/config/openAlexMappings";
+import { disciplines, type Discipline } from "@/config/disciplines";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -31,7 +16,6 @@ type Props = {
 };
 
 export function DisciplineSelector({ value, onChange, onStart }: Props) {
-  const names = disciplines.map((discipline) => discipline.name);
   const [inputValue, setInputValue] = useState(value?.label ?? "");
   useEffect(() => {
     if (value) setInputValue(value.label);
@@ -54,23 +38,11 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
     };
   }, [normalizedInput]);
 
-  const filteredDisciplines = useMemo(() => {
-    const normalized = inputValue.trim().toLowerCase();
-    if (!normalized || normalized === value?.label.toLowerCase()) return disciplines;
-    return disciplines.filter((discipline) => {
-      const aliases =
-        discipline.slug === "biodiversity-conservation" ? ["ecology"] : [];
-      return [
-        discipline.name,
-        discipline.group,
-        ...(openAlexMappings[discipline.slug] ?? []),
-        ...aliases,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalized);
-    });
-  }, [inputValue, value]);
+  function start() {
+    if (!resolvedSelection) return;
+    onChange(resolvedSelection);
+    onStart(resolvedSelection);
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-[1160px] items-center px-5 py-12 sm:px-8 lg:px-12">
@@ -103,72 +75,45 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
           <label className="mb-3 block text-sm font-semibold text-ink" htmlFor="field-search">
             Choose a field or enter keywords
           </label>
-          <Combobox
-            items={names}
-            filteredItems={filteredDisciplines.map((item) => item.name)}
-            inputValue={inputValue}
-            onInputValueChange={(next) => {
-              setInputValue(next);
-              if (value && next !== value.label) onChange(null);
-            }}
-            value={value?.kind === "discipline" ? value.discipline.name : null}
-            onValueChange={(name) => {
-              const next = disciplines.find((item) => item.name === name) ?? null;
-              onChange(
-                next
-                  ? { kind: "discipline", label: next.name, discipline: next }
-                  : null,
-              );
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              start();
             }}
           >
-            <ComboboxInput
+            <input
               id="field-search"
+              list="research-field-options"
+              value={inputValue}
+              onChange={(event) => {
+                const next = event.target.value;
+                setInputValue(next);
+                if (value && next !== value.label) onChange(null);
+              }}
+              minLength={2}
+              maxLength={120}
+              autoComplete="off"
               aria-label="Choose a research field or enter keywords"
               placeholder="e.g. ecology or lake restoration"
-              showClear
-              className="h-12 w-full rounded-none border-ink/25 bg-surface text-base shadow-none focus-within:border-accent-strong"
+              className="h-12 w-full border border-ink/25 bg-surface px-3 text-base text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-accent-strong"
             />
-            <ComboboxContent className="rounded-none border border-ink/15 shadow-[0_20px_60px_rgb(16_32_48/14%)]">
-              <ComboboxEmpty>
-                {normalizedInput.length >= 2
-                  ? `Press Start to search for “${normalizedInput}”.`
-                  : "Enter at least two characters."}
-              </ComboboxEmpty>
-              <ComboboxList>
-                {disciplineGroups.map((group) => (
-                  filteredDisciplines.some((discipline) => discipline.group === group) && <ComboboxGroup key={group}>
-                    <ComboboxLabel className="text-xs font-semibold uppercase tracking-[0.12em]">
-                      {group}
-                    </ComboboxLabel>
-                    {filteredDisciplines
-                      .filter((discipline) => discipline.group === group)
-                      .map((discipline) => (
-                        <ComboboxItem
-                          key={discipline.slug}
-                          value={discipline.name}
-                          className="min-h-10 rounded-none text-[0.95rem]"
-                        >
-                          {discipline.name}
-                        </ComboboxItem>
-                      ))}
-                  </ComboboxGroup>
-                ))}
-              </ComboboxList>
-            </ComboboxContent>
-          </Combobox>
-          <Button
-            size="lg"
-            className="mt-4 h-12 w-full rounded-none bg-ink text-base text-paper hover:bg-accent-strong"
-            disabled={!resolvedSelection}
-            onClick={() => {
-              if (!resolvedSelection) return;
-              onChange(resolvedSelection);
-              onStart(resolvedSelection);
-            }}
-          >
-            Start
-            <ArrowRight aria-hidden="true" />
-          </Button>
+            <datalist id="research-field-options">
+              {disciplines.map((discipline) => (
+                <option key={discipline.slug} value={discipline.name}>
+                  {discipline.group}
+                </option>
+              ))}
+            </datalist>
+            <Button
+              type="submit"
+              size="lg"
+              className="mt-4 h-12 w-full rounded-none bg-ink text-base text-paper hover:bg-accent-strong"
+              disabled={!resolvedSelection}
+            >
+              Start
+              <ArrowRight aria-hidden="true" />
+            </Button>
+          </form>
           <p className="mt-3 text-sm leading-6 text-ink-muted">
             Choose a suggestion, or keep your own keywords and press Start.
           </p>
