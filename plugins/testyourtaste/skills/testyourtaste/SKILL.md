@@ -1,19 +1,19 @@
 ---
 name: testyourtaste
-description: Turn comma-separated research keywords into a Test Your Taste round using a real Chinese- or English-language paper. Use when the user invokes @testyourtaste or $testyourtaste with quoted keywords, asks to play Test Your Taste by keyword, or wants a paper guessing game that shows the year, title, abstract, journal choices, and citation-range choices. Requires the public Test Your Taste website in a browser that supports website tools; do not use it for ordinary literature searches or paper recommendations.
+description: "根据逗号分隔的研究关键词，从真实的中文或英文论文中生成 Test Your Taste 竞猜题。用户调用 @testyourtaste 或 $testyourtaste、按关键词开始游戏、查看帮助，或想通过论文年代、标题、摘要猜期刊和引用量时使用。需要能访问公开游戏网站并支持网站工具的浏览器；不要用于普通文献检索或论文推荐。"
 ---
 
 # Test Your Taste
 
-Run the published game at:
+公开游戏地址：
 
 https://test-your-taste.zhujiangqiu.chatgpt.site/
 
-The website is the source of truth for the paper, choices, answers, citation count, and score. Never invent, complete, translate, or replace game data.
+网站是论文、选项、正确答案、引用量和得分的唯一数据来源。不要编造、补全、翻译或替换游戏数据。
 
-## Show help
+## 显示帮助
 
-Check for help before parsing keywords or opening the website. If the trimmed text after `@testyourtaste` or `$testyourtaste` is `help`, `--help`, or `帮助`, return the following guide and stop:
+解析关键词或打开网站前，先检查命令。如果 `@testyourtaste` 或 `$testyourtaste` 后面的内容去除首尾空格后等于 `help`、`--help` 或 `帮助`，只输出下面的说明，然后停止：
 
 ```text
 Test Your Taste 使用方法
@@ -23,7 +23,7 @@ Test Your Taste 使用方法
 
 示例：
 @testyourtaste "湖泊生态, 水生植物, 恢复"
-@testyourtaste "machine learning, protein structure"
+@testyourtaste "机器学习, 蛋白质结构"
 
 游戏会输出：
 1. 论文年代、标题和摘要
@@ -41,37 +41,37 @@ Codex 兼容写法：
 $testyourtaste "关键词A, 关键词B, 关键词C"
 ```
 
-Do not access the game website, retrieve a paper, or start a round for a help request.
+帮助请求不得访问游戏网站、检索论文或开始新一局。
 
-## Parse the invocation
+## 解析关键词
 
-1. Read the text after `@testyourtaste` or `$testyourtaste`. Remove one matching pair of surrounding straight or curly quotation marks.
-2. Split on commas, Chinese commas, semicolons, or Chinese semicolons. Trim each term, discard empty terms, and remove case-insensitive duplicates while keeping the original order.
-3. Join the remaining terms with one space. This is the single keyword query sent to the game. Keep the query between 2 and 120 characters; if it is longer, keep complete terms from the left that fit and tell the user which terms are being used.
-4. If no usable keyword remains, ask for one or more comma-separated keywords and stop.
+1. 读取 `@testyourtaste` 或 `$testyourtaste` 后面的文字，去掉一对匹配的中英文引号。
+2. 按英文逗号、中文逗号、英文分号或中文分号拆分。去除首尾空格和空项，并按原顺序删除重复关键词。
+3. 用一个空格连接剩余关键词，作为提交给游戏的查询词。查询长度必须为 2–120 个字符；如果太长，只保留左侧能完整放入的关键词，并告诉用户实际使用了哪些词。
+4. 如果没有可用关键词，请用户提供一个或多个用逗号分隔的关键词，然后停止。
 
-Example: `@testyourtaste "湖泊生态, macrophyte, restoration"` becomes the query `湖泊生态 macrophyte restoration`.
+示例：`@testyourtaste "湖泊生态, 水生植物, 恢复"` 会转换为 `湖泊生态 水生植物 恢复`。
 
-## Start a round
+## 开始一局
 
-1. Open or reuse the top-level public site in the built-in browser. Keep it open because its website tools are available only while the page remains open.
-2. Call `start_research_taste_game` with `keyword` set to the normalized query. Do not pass `disciplineSlug` when a keyword was supplied.
-3. Wait for the visible page to show one paper, its abstract, six journal choices, and five citation ranges.
-4. Read the year, title, abstract, and journal choices exactly from the visible page. The game already excludes languages other than Chinese and English.
-5. Present the round in the exact structure below. Preserve the journal order shown by the site. Do not reveal, imply, or highlight either correct answer.
+1. 在内置浏览器中打开或复用公开游戏首页。保持首页打开，因为网站工具只在页面打开时可用。
+2. 调用 `start_research_taste_game`，把规范化后的查询词传给 `keyword`。用户提供关键词时不要传 `disciplineSlug`。
+3. 等待页面显示一篇论文、摘要、六个期刊选项和五个引用量区间。
+4. 从页面准确读取年代、标题、摘要和期刊选项。网站已经排除中文和英文之外的论文。
+5. 严格按下面的结构输出，并保持期刊选项顺序不变。不要泄露、暗示或突出正确答案。
 
 ```text
-年代：<year>
-标题：<title>
-摘要：<abstract>
+年代：<年代>
+标题：<标题>
+摘要：<摘要>
 
 问题 1：这篇论文发表在哪本期刊？
-A. <journal 1>
-B. <journal 2>
-C. <journal 3>
-D. <journal 4>
-E. <journal 5>
-F. <journal 6>
+A. <期刊 1>
+B. <期刊 2>
+C. <期刊 3>
+D. <期刊 4>
+E. <期刊 5>
+F. <期刊 6>
 
 问题 2：这篇论文被引用了多少次？
 A. 0–25
@@ -83,9 +83,9 @@ E. >1000
 请按“期刊字母 + 引用量字母”作答，例如：B, D。
 ```
 
-## Accept and submit a guess
+## 接受并提交答案
 
-Accept letters or displayed values. Map journal letters to the current page's six choices and citation letters as follows:
+接受字母或页面上显示的具体选项。期刊字母对应当前页面的六个期刊；引用量字母按下面映射：
 
 - A → `0-25`
 - B → `26-100`
@@ -93,28 +93,28 @@ Accept letters or displayed values. Map journal letters to the current page's si
 - D → `301-1000`
 - E → `1001+`
 
-Normalize harmless typography differences such as an en dash, but never substitute a different choice. If either answer is missing or ambiguous, ask only for the missing choice.
+可以统一破折号等无害的排版差异，但不要替用户选择别的答案。如果缺少一个答案或表达不清，只追问缺少的选项。
 
-Call `submit_taste_guess` with:
+调用 `submit_taste_guess` 时传入：
 
-- `journal`: the selected journal name exactly as displayed;
-- `citationRange`: one of `0-25`, `26-100`, `101-300`, `301-1000`, or `1001+`.
+- `journal`：页面显示的完整期刊名称；
+- `citationRange`：`0-25`、`26-100`、`101-300`、`301-1000` 或 `1001+`。
 
-Report the website's verified correct journal, exact citation count, result for each question, and updated score. Do not calculate correctness independently.
+报告网站验证的正确期刊、准确引用量、两道题的结果和更新后的得分。不要自行判断正误。
 
-## Continue or stop
+## 继续或停止
 
-After revealing the result, ask whether the user wants another paper with the same keywords, new keywords, or to stop. Preserve the visible session score while continuing.
+公布结果后，询问用户是继续使用相同关键词、换一组关键词，还是停止。继续游戏时保留页面上的本局得分。
 
-## Recovery
+## 异常处理
 
-- If website tools are unavailable, open the public game link and explain that direct in-chat play needs a supported built-in browser with website tools. Do not claim that a tool call succeeded when it did not.
-- If retrieval returns no suitable paper, retry once with the same normalized query. If it still fails, ask the user to broaden or reduce the keyword list; do not add a failed round to the score.
-- If the current interface cannot use website tools, provide the public game link so the user can play manually.
+- 如果网站工具不可用，打开公开游戏链接，并说明聊天内直接游玩需要支持网站工具的内置浏览器。不要假装调用成功。
+- 如果没有找到合适论文，用同一查询词重试一次。如果仍然失败，请用户减少关键词或扩大范围；失败轮次不计分。
+- 如果当前界面完全不能使用网站工具，提供公开游戏链接供用户手动游玩。
 
-## Invocation examples
+## 调用示例
 
 - `@testyourtaste help`
 - `@testyourtaste "湖泊生态, 水生植物, 恢复"`
-- `@testyourtaste "machine learning, protein structure"`
-- In Codex, use `$testyourtaste "climate change, biodiversity"` if `@` mentions are unavailable.
+- `@testyourtaste "机器学习, 蛋白质结构"`
+- 如果 Codex 不支持 `@` 插件调用，使用 `$testyourtaste "气候变化, 生物多样性"`。

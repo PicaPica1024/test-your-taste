@@ -1,40 +1,41 @@
-# Install and use Test Your Taste
+# 安装和使用 Test Your Taste
 
-## Try it from this repository
+## 一行提示词安装
 
-1. Open this repository in the ChatGPT desktop app or Codex.
-2. Restart the app so it discovers `.agents/plugins/marketplace.json`.
-3. Open **Plugins**, select **Test Your Taste Local**, open **Test Your Taste**, and choose **Install**.
-4. Start a new chat.
-5. In ChatGPT or Work, enter one line such as:
-
-   `@testyourtaste "湖泊生态, 水生植物, 恢复"`
-
-   The skill returns the paper's year, title, abstract, six journal choices, and five citation-range choices. It does not reveal the answers until the user guesses.
-
-   To display the complete usage guide:
-
-   `@testyourtaste help`
-
-   In Codex, use `$` if `@` mentions are unavailable:
-
-   `$testyourtaste "湖泊生态, 水生植物, 恢复"`
-
-The direct-play workflow requires the ChatGPT desktop built-in browser and website tools. If those are unavailable, the skill links to the public game for manual play.
-
-## Share it from GitHub
-
-Another Codex user can add the public marketplace and install the plugin with:
-
-```bash
-codex plugin marketplace add PicaPica1024/test-your-taste --ref main
-codex plugin add testyourtaste@test-your-taste-local
-```
-
-They then start a new session and invoke:
+把下面这一整句话发给 Codex：
 
 ```text
-$testyourtaste "keyword a, keyword b"
+请在终端依次执行 codex plugin marketplace add PicaPica1024/test-your-taste --ref main 和 codex plugin add testyourtaste@test-your-taste-local，帮我安装 Test Your Taste；安装完成后告诉我如何开始游戏。
 ```
 
-ChatGPT desktop users can select **Test Your Taste Local** in the Plugins Directory, install **Test Your Taste**, start a new chat, and invoke `@testyourtaste "keyword a, keyword b"`.
+执行过程中如果出现权限确认，点击允许。安装完成后新建一个任务。
+
+如果自动安装没有成功，可以直接在终端运行：
+
+```bash
+codex plugin marketplace add PicaPica1024/test-your-taste --ref main && codex plugin add testyourtaste@test-your-taste-local
+```
+
+## 开始游戏
+
+在 Codex 中输入：
+
+```text
+$testyourtaste "湖泊生态, 水生植物, 恢复"
+```
+
+查看完整帮助：
+
+```text
+$testyourtaste help
+```
+
+在支持插件 `@` 调用的 ChatGPT 界面中，使用：
+
+```text
+@testyourtaste "湖泊生态, 水生植物, 恢复"
+```
+
+这个技能会输出论文年代、标题、摘要、六个期刊选项和五个引用量区间；用户作答后才公布答案。
+
+直接在聊天中游玩需要支持网站工具的内置浏览器。如果当前界面不支持，这个技能会提供公开游戏链接。

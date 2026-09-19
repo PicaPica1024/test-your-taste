@@ -1,58 +1,61 @@
-# Test Your Taste
+# Test Your Taste：论文品味竞猜
 
-[中文说明](README.zh-CN.md)
+只看标题和摘要，你能猜出论文发表在哪本期刊吗？引用量又能猜对吗？
 
-Think you can guess a paper's journal from its title and abstract? What about its citation range?
+**Test Your Taste** 会找来一篇真实论文，把答案藏起来，让你猜期刊和引用量。规则很简单，但猜起来可能比想象中难。
 
-**Test Your Taste** gives you a real research paper, hides the answer, and asks you to make both guesses. It is quick, slightly nerdy, and surprisingly hard.
+[在线玩游戏](https://test-your-taste.zhujiangqiu.chatgpt.site/)
 
-[Play the live game](https://test-your-taste.zhujiangqiu.chatgpt.site/)
+## 它能做什么
 
-## What it does
+- 按学科或自定义关键词找论文。
+- 只使用 OpenAlex 中的中文或英文论文。
+- 让你猜期刊和引用量区间。
+- 公布答案，并在浏览器里记录得分。
 
-- Search by research field or your own keywords.
-- Show a real Chinese- or English-language paper from OpenAlex.
-- Ask you to guess the journal and citation range.
-- Reveal the answer and keep score locally in your browser.
+不需要注册账号，也不需要数据库。
 
-No account or database is required.
+## 一行提示词安装技能
 
-## Use it as a skill
-
-Install the public marketplace:
-
-```bash
-codex plugin marketplace add PicaPica1024/test-your-taste --ref main
-codex plugin add testyourtaste@test-your-taste-local
-```
-
-Start a new Codex task, then run:
+把下面这一整句话复制给 Codex：
 
 ```text
-$testyourtaste "lake ecology, aquatic plants, restoration"
+请在终端依次执行 codex plugin marketplace add PicaPica1024/test-your-taste --ref main 和 codex plugin add testyourtaste@test-your-taste-local，帮我安装 Test Your Taste；安装完成后告诉我如何开始游戏。
 ```
 
-Use `$testyourtaste help` for instructions. In ChatGPT interfaces that support plugin mentions, use `@testyourtaste` instead.
+Codex 可能会请求执行终端命令的权限，点击允许即可。安装后新建一个任务，然后输入：
 
-## Run it locally
+```text
+$testyourtaste "湖泊生态, 水生植物, 恢复"
+```
 
-Requires Node.js 22.13 or newer.
+输入 `$testyourtaste help` 可以查看帮助。在支持插件 `@` 调用的 ChatGPT 界面中，改用 `@testyourtaste`。
+
+如果自动安装没有成功，可以直接在终端运行这一行：
+
+```bash
+codex plugin marketplace add PicaPica1024/test-your-taste --ref main && codex plugin add testyourtaste@test-your-taste-local
+```
+
+## 本地运行
+
+需要 Node.js 22.13 或更高版本。
 
 ```bash
 npm ci
 npm run dev
 ```
 
-For production, add `OPENALEX_API_KEY` as a secret environment variable. Never commit the key.
+正式部署时，把 `OPENALEX_API_KEY` 配置为 Secret 环境变量，不要把密钥提交到 Git。
 
 ```bash
 npm run build
 npm start
 ```
 
-## A few notes
+## 补充说明
 
-- Citation counts come from OpenAlex and may change.
-- Journal alternatives are curated game choices, not official rankings.
-- Scores and seen-paper history stay in the current browser.
-- This is a lightweight guessing game, not an anti-cheat system.
+- 引用量来自 OpenAlex，之后可能会变化。
+- 期刊干扰项是为了游戏体验人工整理的，不代表官方排名。
+- 得分和已看过的论文只保存在当前浏览器。
+- 这是一个轻量小游戏，不是严格的防作弊系统。
