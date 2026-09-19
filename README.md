@@ -18,21 +18,9 @@
 
 延伸阅读：
 
-- Uri Alon. [How To Choose a Good Scientific Problem](https://doi.org/10.1016/j.molcel.2009.09.013
-        
-        
-        
-        ). *Molecular Cell* 35, 726–728 (2009).
-- Maja Jagodic et al. [Nurture your scientific curiosity early in your research career](https://doi.org/10.1038/ng.2527
-        
-        
-        
-        ). *Nature Genetics* 45, 116–118 (2013).
-- Diana Hicks et al. [Bibliometrics: The Leiden Manifesto for research metrics](https://doi.org/10.1038/520429a
-        
-        
-        
-        ). *Nature* 520, 429–431 (2015).
+1. Alon, U. (2009). How to choose a good scientific problem. *Molecular Cell*, 35(6), 726–728. DOI: <https://doi.org/10.1016/j.molcel.2009.09.013>
+2. Jagodic, M., et al. (2013). Nurture your scientific curiosity early in your research career. *Nature Genetics*, 45, 116–118. DOI: <https://doi.org/10.1038/ng.2527>
+3. Hicks, D., et al. (2015). Bibliometrics: The Leiden Manifesto for research metrics. *Nature*, 520, 429–431. DOI: <https://doi.org/10.1038/520429a>
 
 ## 它能做什么
 
