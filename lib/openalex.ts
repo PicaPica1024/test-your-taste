@@ -217,7 +217,6 @@ export async function searchWorksByKeyword(
   keyword: string,
   citationFilter: string,
   cutoffYear: number,
-  seed: number,
   signal?: AbortSignal,
 ) {
   const filter = [
@@ -231,9 +230,8 @@ export async function searchWorksByKeyword(
   const params = new URLSearchParams({
     search: keyword,
     filter,
-    sample: "50",
-    "per-page": "50",
-    seed: String(seed),
+    sort: "relevance_score:desc",
+    per_page: "100",
     select:
       "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
   });

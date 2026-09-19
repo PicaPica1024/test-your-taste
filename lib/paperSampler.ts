@@ -42,12 +42,62 @@ function isRelevant(work: OpenAlexWork, topicId: string) {
   );
 }
 
+const keywordStopWords = new Set([
+  "a",
+  "an",
+  "and",
+  "for",
+  "in",
+  "not",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+]);
+
+function matchesVisibleKeyword(
+  keyword: string,
+  title: string,
+  abstract: string,
+) {
+  const searchable = `${title} ${abstract}`.normalize("NFKC").toLowerCase();
+  const compactSearchable = searchable.replace(/[\s\p{P}\p{S}]/gu, "");
+  const terms =
+    keyword
+      .normalize("NFKC")
+      .toLowerCase()
+      .match(/[\p{L}\p{N}]+/gu)
+      ?.filter((term) => !keywordStopWords.has(term)) ?? [];
+  if (!terms.length) return false;
+
+  return terms.every((term) => {
+    if (/\p{Script=Han}/u.test(term)) {
+      const compactTerm = term.replace(/[^\p{Script=Han}\p{N}]/gu, "");
+      if (compactTerm.length <= 3) return compactSearchable.includes(compactTerm);
+      const bigrams = Array.from(
+        { length: compactTerm.length - 1 },
+        (_, index) => compactTerm.slice(index, index + 2),
+      );
+      const matches = bigrams.filter((pair) => compactSearchable.includes(pair));
+      return matches.length >= Math.ceil(bigrams.length * 0.6);
+    }
+
+    const root = term.length >= 5 ? term.slice(0, 4) : term;
+    const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`\\b${escaped}[\\p{L}\\p{N}]*\\b`, "iu").test(
+      searchable,
+    );
+  });
+}
+
 function validateWork(
   work: OpenAlexWork,
   topicId: string | undefined,
   cutoffYear: number,
   excluded: Set<string>,
   hints: string[] | undefined,
+  keyword?: string,
 ) {
   if (work.language !== "en" && work.language !== "zh") return null;
   const abstract = reconstructAbstract(work.abstract_inverted_index);
@@ -73,6 +123,7 @@ function validateWork(
     const searchable = `${work.title} ${abstract}`.toLowerCase();
     if (!hints.some((hint) => searchable.includes(hint))) return null;
   }
+  if (keyword && !matchesVisibleKeyword(keyword, work.title, abstract)) return null;
   return { abstract, journal, year };
 }
 
@@ -159,13 +210,11 @@ export async function findRoundByKeyword(
   const attempts = [preferred, ...shuffled(strata.filter((s) => s !== preferred))];
 
   for (const stratum of attempts) {
-    const seed = Math.floor(Math.random() * 2_000_000_000);
     const works = shuffled(
       await searchWorksByKeyword(
         keyword,
         stratum.filter,
         cutoffYear,
-        seed,
         signal,
       ),
     );
@@ -177,6 +226,7 @@ export async function findRoundByKeyword(
         cutoffYear,
         excluded,
         undefined,
+        keyword,
       );
       if (!valid) continue;
       const journalOptions = buildKeywordJournalOptions(
