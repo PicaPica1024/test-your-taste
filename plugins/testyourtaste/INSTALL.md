@@ -5,7 +5,7 @@
 把下面这一整句话发给 Codex：
 
 ```text
-请在终端依次执行 codex plugin marketplace add PicaPica1024/test-your-taste --ref main 和 codex plugin add testyourtaste@test-your-taste-local，帮我安装 Test Your Taste；安装完成后告诉我如何开始游戏。
+帮我从 PicaPica1024/test-your-taste 安装 testyourtaste 插件。
 ```
 
 执行过程中如果出现权限确认，点击允许。安装完成后新建一个任务。

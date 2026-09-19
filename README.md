@@ -20,10 +20,10 @@
 把下面这一整句话复制给 Codex：
 
 ```text
-请在终端依次执行 codex plugin marketplace add PicaPica1024/test-your-taste --ref main 和 codex plugin add testyourtaste@test-your-taste-local，帮我安装 Test Your Taste；安装完成后告诉我如何开始游戏。
+帮我从 PicaPica1024/test-your-taste 安装 testyourtaste 插件。
 ```
 
-Codex 可能会请求执行终端命令的权限，点击允许即可。安装后新建一个任务，然后输入：
+Codex 会自动识别仓库中的插件市场；如果请求执行终端命令的权限，点击允许即可。安装后新建一个任务，然后输入：
 
 ```text
 $testyourtaste "湖泊生态, 水生植物, 恢复"
