@@ -4,23 +4,35 @@
 
 **Test Your Taste** 会找来一篇真实论文，把答案藏起来，让你猜期刊和引用量。规则很简单，但猜起来可能比想象中难。
 
-[在线玩游戏](https://test-your-taste.zhujiangqiu.chatgpt.site/)
+[在线玩](https://test-your-taste.zhujiangqiu.chatgpt.site/)
 
 ## 我理解的“科研品味”
 
-“科研品味”这个词被人用得多了，听起来越来越玄乎。对我来说，它其实很朴素：**判断什么是好研究的能力。**
+“科研品味”这个词被人用的太多了，听起来越来越玄乎。在我看来，它其实很朴素：**判断什么是好研究的能力。**
 
-好的研究，首先要回答一个重要问题。更有价值、更有影响力的研究，不只给出一个答案，还会改变我们看问题的方式，并由此打开更多有意思的问题，让后来者愿意沿着这条路继续探索。Uri Alon 在 *Molecular Cell* 的文章中把“选对问题”视为成为好科学家的关键，并强调问题能否带来显著的知识增量；*Nature Genetics* 的一篇评论也指出，对未知的好奇心、冒险精神和对意外发现的开放态度，是突破性研究的重要动力。
+好的研究，首先要回答一个重要问题。而更有价值、更有影响力的研究，不仅要回答一个问题，还要创造出新的更有趣的问题，并由此打开更多的可能性，让后来者愿意沿着这条路继续探索。ai越来越能够在执行层面接替我们的工作，但是判断和选择总是留给人的——我们的时间，精力和资源永远是有限的，如何分配他们，我们不得不做出判断和选择。Uri Alon 在 *Molecular Cell* 的文章中把“选对问题”视为成为好科学家的关键，并强调问题能否带来显著的知识增量；*Nature Genetics* 的一篇评论也指出，对未知的好奇心、冒险精神和对意外发现的开放态度，是突破性研究的重要动力。
 
-所以我做了这个游戏：在不知道作者和期刊名称的情况下，只看发表年份、标题和摘要，你能判断这项研究可能发表在什么层级的期刊，又可能产生多大的影响吗？
+这就是游戏的初衷：在不知道作者和期刊名称的情况下，根据发表年份、标题和摘要，你能判断这项研究可能发表在什么层级的期刊，又可能产生多大的影响吗？
 
-当然，期刊和引用量只是线索，不是科研质量本身。*Nature* 发表的《莱顿宣言》提醒我们：定量指标应该辅助专家判断，而不能取代对研究内容本身的评价。**这个游戏测试的是你对研究问题、叙事和潜在影响力的直觉，不是在给论文盖棺定论。**
+当然，期刊声誉和引用量只是研究质量的一些侧面，不能等同于科研质量本身。正如莱顿宣言所说定量指标应该辅助专家判断，而不能取代对研究内容本身的评价。**这个游戏测试的是你对研究问题、叙事和潜在影响力的直觉，不是在给这些工作的质量盖棺定论。**
 
 延伸阅读：
 
-- Uri Alon. [How To Choose a Good Scientific Problem](https://doi.org/10.1016/j.molcel.2009.09.013). *Molecular Cell* 35, 726–728 (2009).
-- Maja Jagodic et al. [Nurture your scientific curiosity early in your research career](https://doi.org/10.1038/ng.2527). *Nature Genetics* 45, 116–118 (2013).
-- Diana Hicks et al. [Bibliometrics: The Leiden Manifesto for research metrics](https://doi.org/10.1038/520429a). *Nature* 520, 429–431 (2015).
+- Uri Alon. [How To Choose a Good Scientific Problem](https://doi.org/10.1016/j.molcel.2009.09.013
+        
+        
+        
+        ). *Molecular Cell* 35, 726–728 (2009).
+- Maja Jagodic et al. [Nurture your scientific curiosity early in your research career](https://doi.org/10.1038/ng.2527
+        
+        
+        
+        ). *Nature Genetics* 45, 116–118 (2013).
+- Diana Hicks et al. [Bibliometrics: The Leiden Manifesto for research metrics](https://doi.org/10.1038/520429a
+        
+        
+        
+        ). *Nature* 520, 429–431 (2015).
 
 ## 它能做什么
 
