@@ -20,22 +20,43 @@ import { openAlexMappings } from "@/config/openAlexMappings";
 import { ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+export type ResearchSelection =
+  | { kind: "discipline"; label: string; discipline: Discipline }
+  | { kind: "keyword"; label: string; keyword: string };
+
 type Props = {
-  value: Discipline | null;
-  onChange: (discipline: Discipline | null) => void;
-  onStart: () => void;
+  value: ResearchSelection | null;
+  onChange: (selection: ResearchSelection | null) => void;
+  onStart: (selection: ResearchSelection) => void;
 };
 
 export function DisciplineSelector({ value, onChange, onStart }: Props) {
   const names = disciplines.map((discipline) => discipline.name);
-  const [inputValue, setInputValue] = useState(value?.name ?? "");
+  const [inputValue, setInputValue] = useState(value?.label ?? "");
   useEffect(() => {
-    if (value) setInputValue(value.name);
+    if (value) setInputValue(value.label);
   }, [value]);
+
+  const normalizedInput = inputValue.trim().replace(/\s+/g, " ");
+  const resolvedSelection = useMemo<ResearchSelection | null>(() => {
+    if (normalizedInput.length < 2 || normalizedInput.length > 120) return null;
+    const exact = disciplines.find(
+      (discipline) =>
+        discipline.name.toLowerCase() === normalizedInput.toLowerCase(),
+    );
+    if (exact) {
+      return { kind: "discipline", label: exact.name, discipline: exact };
+    }
+    return {
+      kind: "keyword",
+      label: normalizedInput,
+      keyword: normalizedInput,
+    };
+  }, [normalizedInput]);
 
   const filteredDisciplines = useMemo(() => {
     const normalized = inputValue.trim().toLowerCase();
-    if (!normalized || normalized === value?.name.toLowerCase()) return disciplines;
+    if (!normalized || normalized === value?.label.toLowerCase()) return disciplines;
     return disciplines.filter((discipline) => {
       const aliases =
         discipline.slug === "biodiversity-conservation" ? ["ecology"] : [];
@@ -80,7 +101,7 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
             Read a real paper. Guess the journal. Guess its impact.
           </p>
           <label className="mb-3 block text-sm font-semibold text-ink" htmlFor="field-search">
-            Choose a research field
+            Choose a field or enter keywords
           </label>
           <Combobox
             items={names}
@@ -88,23 +109,31 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
             inputValue={inputValue}
             onInputValueChange={(next) => {
               setInputValue(next);
-              if (value && next !== value.name) onChange(null);
+              if (value && next !== value.label) onChange(null);
             }}
-            value={value?.name ?? null}
+            value={value?.kind === "discipline" ? value.discipline.name : null}
             onValueChange={(name) => {
               const next = disciplines.find((item) => item.name === name) ?? null;
-              onChange(next);
+              onChange(
+                next
+                  ? { kind: "discipline", label: next.name, discipline: next }
+                  : null,
+              );
             }}
           >
             <ComboboxInput
               id="field-search"
-              aria-label="Search research fields"
-              placeholder="Search fields, e.g. ecology"
+              aria-label="Choose a research field or enter keywords"
+              placeholder="e.g. ecology or lake restoration"
               showClear
               className="h-12 w-full rounded-none border-ink/25 bg-surface text-base shadow-none focus-within:border-accent-strong"
             />
             <ComboboxContent className="rounded-none border border-ink/15 shadow-[0_20px_60px_rgb(16_32_48/14%)]">
-              <ComboboxEmpty>No matching research field.</ComboboxEmpty>
+              <ComboboxEmpty>
+                {normalizedInput.length >= 2
+                  ? `Press Start to search for “${normalizedInput}”.`
+                  : "Enter at least two characters."}
+              </ComboboxEmpty>
               <ComboboxList>
                 {disciplineGroups.map((group) => (
                   filteredDisciplines.some((discipline) => discipline.group === group) && <ComboboxGroup key={group}>
@@ -130,15 +159,22 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
           <Button
             size="lg"
             className="mt-4 h-12 w-full rounded-none bg-ink text-base text-paper hover:bg-accent-strong"
-            disabled={!value}
-            onClick={onStart}
+            disabled={!resolvedSelection}
+            onClick={() => {
+              if (!resolvedSelection) return;
+              onChange(resolvedSelection);
+              onStart(resolvedSelection);
+            }}
           >
             Start
             <ArrowRight aria-hidden="true" />
           </Button>
+          <p className="mt-3 text-sm leading-6 text-ink-muted">
+            Choose a suggestion, or keep your own keywords and press Start.
+          </p>
           <p className="mt-4 text-sm leading-6 text-ink-muted">
-            Papers are selected from OpenAlex and were published at least ten
-            years ago.
+            English and Chinese papers only. Papers are selected from OpenAlex
+            and were published at least ten years ago.
           </p>
         </div>
       </section>

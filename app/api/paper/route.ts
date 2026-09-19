@@ -1,6 +1,6 @@
 import { disciplinesBySlug } from "@/config/disciplines";
 import { OpenAlexError } from "@/lib/openalex";
-import { findRound } from "@/lib/paperSampler";
+import { findRound, findRoundByKeyword } from "@/lib/paperSampler";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -9,14 +9,19 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as {
       discipline?: string;
+      keyword?: string;
       excludedIds?: unknown;
     };
     const discipline = body.discipline
       ? disciplinesBySlug.get(body.discipline)
       : undefined;
-    if (!discipline) {
+    const keyword =
+      typeof body.keyword === "string"
+        ? body.keyword.trim().replace(/\s+/g, " ")
+        : "";
+    if (!discipline && (!keyword || keyword.length < 2 || keyword.length > 120)) {
       return NextResponse.json(
-        { error: "Choose a valid research field." },
+        { error: "Choose a valid research field or enter 2–120 characters of keywords." },
         { status: 400 },
       );
     }
@@ -25,7 +30,9 @@ export async function POST(request: Request) {
           (value): value is string => typeof value === "string",
         ).slice(-100)
       : [];
-    const round = await findRound(discipline, excludedIds, request.signal);
+    const round = discipline
+      ? await findRound(discipline, excludedIds, request.signal)
+      : await findRoundByKeyword(keyword, excludedIds, request.signal);
     return NextResponse.json(round, {
       headers: { "Cache-Control": "no-store" },
     });

@@ -53,7 +53,7 @@ export function Results({ round, journalGuess, citationGuess, onNext, onChangeFi
           <p className="mt-2 text-xs text-ink-muted">Citation source: OpenAlex · Retrieved {retrieved}</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="ghost" className="rounded-none" onClick={onChangeField}>Change Field</Button>
+          <Button variant="ghost" className="rounded-none" onClick={onChangeField}>Change Topic</Button>
           <Button className="h-11 rounded-none bg-accent-strong px-6 text-white hover:bg-ink" onClick={onNext}>
             Next Paper <ArrowRight aria-hidden="true" />
           </Button>

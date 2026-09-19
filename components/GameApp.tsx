@@ -2,11 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { disciplines, type Discipline } from "@/config/disciplines";
+import { disciplines } from "@/config/disciplines";
 import { citationRanges, type CitationRangeId, type Round, type SessionStats } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import { CitationQuiz } from "./CitationQuiz";
-import { DisciplineSelector } from "./DisciplineSelector";
+import { DisciplineSelector, type ResearchSelection } from "./DisciplineSelector";
 import { JournalQuiz } from "./JournalQuiz";
 import { PaperCard } from "./PaperCard";
 import { Results } from "./Results";
@@ -18,7 +18,7 @@ type Screen = "select" | "loading" | "playing" | "error";
 
 export function GameApp() {
   const [screen, setScreen] = useState<Screen>("select");
-  const [discipline, setDiscipline] = useState<Discipline | null>(null);
+  const [researchSelection, setResearchSelection] = useState<ResearchSelection | null>(null);
   const [round, setRound] = useState<Round | null>(null);
   const [journalGuess, setJournalGuess] = useState<string | null>(null);
   const [citationGuess, setCitationGuess] = useState<CitationRangeId | null>(null);
@@ -37,8 +37,28 @@ export function GameApp() {
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as { discipline?: string; stats?: SessionStats; shownIds?: string[] } | null;
-      if (saved?.discipline) setDiscipline(disciplines.find((item) => item.slug === saved.discipline) ?? null);
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as {
+        discipline?: string;
+        selection?: { kind?: string; slug?: string; keyword?: string };
+        stats?: SessionStats;
+        shownIds?: string[];
+      } | null;
+      if (saved?.selection?.kind === "keyword" && saved.selection.keyword) {
+        const keyword = saved.selection.keyword.trim().replace(/\s+/g, " ");
+        if (keyword.length >= 2 && keyword.length <= 120) {
+          setResearchSelection({ kind: "keyword", label: keyword, keyword });
+        }
+      } else {
+        const slug = saved?.selection?.slug ?? saved?.discipline;
+        const restored = disciplines.find((item) => item.slug === slug);
+        if (restored) {
+          setResearchSelection({
+            kind: "discipline",
+            label: restored.name,
+            discipline: restored,
+          });
+        }
+      }
       if (saved?.stats) setStats(saved.stats);
       if (Array.isArray(saved?.shownIds)) setShownIds(saved.shownIds.slice(-100));
     } catch {
@@ -50,8 +70,13 @@ export function GameApp() {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ discipline: discipline?.slug, stats, shownIds }));
-  }, [discipline, stats, shownIds, hydrated]);
+    const selection = researchSelection
+      ? researchSelection.kind === "discipline"
+        ? { kind: "discipline", slug: researchSelection.discipline.slug }
+        : { kind: "keyword", keyword: researchSelection.keyword }
+      : undefined;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ selection, stats, shownIds }));
+  }, [researchSelection, stats, shownIds, hydrated]);
 
   useEffect(() => {
     const context = document.modelContext;
@@ -62,21 +87,41 @@ export function GameApp() {
       Promise.resolve(context.registerTool({
         name: "start_research_taste_game",
         title: "Start research taste game",
-        description: "Start a Test Your Taste round in one valid research field and update the visible game with a real OpenAlex paper.",
+        description: "Start a Test Your Taste round with either a configured discipline slug or custom research keywords, then update the visible game with a real OpenAlex paper.",
         inputSchema: {
           type: "object",
-          properties: { disciplineSlug: { type: "string", description: "A slug from the configured discipline taxonomy." } },
-          required: ["disciplineSlug"],
+          properties: {
+            disciplineSlug: { type: "string", description: "A slug from the configured discipline taxonomy." },
+            keyword: { type: "string", minLength: 2, maxLength: 120, description: "Custom keywords to search in OpenAlex." },
+          },
           additionalProperties: false,
         },
         annotations: { readOnlyHint: false, untrustedContentHint: true },
         async execute(input) {
-          const slug = typeof input === "object" && input ? (input as { disciplineSlug?: unknown }).disciplineSlug : undefined;
-          const target = disciplines.find((item) => item.slug === slug);
-          if (!target) throw new Error("Unknown discipline slug");
-          setDiscipline(target);
+          const values = typeof input === "object" && input
+            ? (input as { disciplineSlug?: unknown; keyword?: unknown })
+            : {};
+          const keyword = typeof values.keyword === "string"
+            ? values.keyword.trim().replace(/\s+/g, " ")
+            : "";
+          let target: ResearchSelection;
+          if (keyword) {
+            if (keyword.length < 2 || keyword.length > 120) {
+              throw new Error("Keyword must be 2–120 characters");
+            }
+            target = { kind: "keyword", label: keyword, keyword };
+          } else {
+            const discipline = disciplines.find((item) => item.slug === values.disciplineSlug);
+            if (!discipline) throw new Error("Provide a valid discipline slug or keyword");
+            target = {
+              kind: "discipline",
+              label: discipline.name,
+              discipline,
+            };
+          }
+          setResearchSelection(target);
           await loadPaper(target);
-          return { status: "paper_ready", discipline: target.name };
+          return { status: "paper_ready", researchQuery: target.label };
         },
       }, { signal: lifecycle.signal })),
       Promise.resolve(context.registerTool({
@@ -122,7 +167,7 @@ export function GameApp() {
     return () => lifecycle.abort();
   }, []);
 
-  async function loadPaper(target = discipline) {
+  async function loadPaper(target = researchSelection) {
     if (!target) return;
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -137,7 +182,12 @@ export function GameApp() {
       const response = await fetch("/api/paper", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ discipline: target.slug, excludedIds: shownIdsRef.current }),
+        body: JSON.stringify({
+          ...(target.kind === "discipline"
+            ? { discipline: target.discipline.slug }
+            : { keyword: target.keyword }),
+          excludedIds: shownIdsRef.current,
+        }),
         signal: controller.signal,
       });
       const payload = (await response.json()) as Round | { error?: string };
@@ -197,18 +247,24 @@ export function GameApp() {
   }
 
   if (screen === "select") {
-    return <DisciplineSelector value={discipline} onChange={setDiscipline} onStart={() => loadPaper(discipline)} />;
+    return (
+      <DisciplineSelector
+        value={researchSelection}
+        onChange={setResearchSelection}
+        onStart={loadPaper}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-ink/15 bg-paper/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-[1160px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12">
-          <button onClick={changeField} className="flex items-center gap-3 text-left" aria-label="Return to field selection">
+          <button onClick={changeField} className="flex items-center gap-3 text-left" aria-label="Return to topic selection">
             <span className="grid size-8 place-items-center border border-ink/25 font-serif">T²</span>
             <span className="font-serif text-lg font-semibold text-ink">Test Your Taste</span>
           </button>
-          <button onClick={changeField} className="max-w-[48vw] truncate text-sm font-semibold text-accent-strong hover:underline">{discipline?.name}</button>
+          <button onClick={changeField} className="max-w-[48vw] truncate text-sm font-semibold text-accent-strong hover:underline">{researchSelection?.label}</button>
         </div>
       </header>
 
@@ -222,7 +278,7 @@ export function GameApp() {
               <h1 className="font-serif text-4xl text-ink">Couldn&apos;t find a suitable paper.</h1>
               <p className="mt-4 text-base leading-7 text-ink-muted">{errorMessage ?? "The source may be busy, or this field needs another sample."} Nothing was added to your score.</p>
               <div className="mt-7 flex justify-center gap-3">
-                <Button variant="outline" className="rounded-none" onClick={changeField}>Change Field</Button>
+                <Button variant="outline" className="rounded-none" onClick={changeField}>Change Topic</Button>
                 <Button className="rounded-none bg-accent-strong text-white hover:bg-ink" onClick={() => loadPaper()}>Try Again</Button>
               </div>
             </div>

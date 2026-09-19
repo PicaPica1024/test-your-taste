@@ -9,6 +9,7 @@ export type OpenAlexWork = {
   id: string;
   doi: string | null;
   title: string | null;
+  language: string | null;
   publication_year: number | null;
   cited_by_count: number | null;
   type: string | null;
@@ -190,6 +191,7 @@ export async function sampleWorks(
 ) {
   const filter = [
     `topics.id:${topic.id.split("/").pop()}`,
+    "language:en|zh",
     "has_abstract:true",
     "type:article|review",
     "from_publication_date:1990-01-01",
@@ -202,7 +204,38 @@ export async function sampleWorks(
     "per-page": "25",
     seed: String(seed),
     select:
-      "id,doi,title,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
+      "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
+  });
+  const payload = await openAlexFetch<ApiList<OpenAlexWork>>(
+    `/works?${params}`,
+    signal,
+  );
+  return payload.results ?? [];
+}
+
+export async function searchWorksByKeyword(
+  keyword: string,
+  citationFilter: string,
+  cutoffYear: number,
+  seed: number,
+  signal?: AbortSignal,
+) {
+  const filter = [
+    "language:en|zh",
+    "has_abstract:true",
+    "type:article|review",
+    "from_publication_date:1990-01-01",
+    `to_publication_date:${cutoffYear}-12-31`,
+    `cited_by_count:${citationFilter}`,
+  ].join(",");
+  const params = new URLSearchParams({
+    search: keyword,
+    filter,
+    sample: "50",
+    "per-page": "50",
+    seed: String(seed),
+    select:
+      "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
   });
   const payload = await openAlexFetch<ApiList<OpenAlexWork>>(
     `/works?${params}`,
