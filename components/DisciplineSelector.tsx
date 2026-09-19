@@ -13,9 +13,15 @@ type Props = {
   value: ResearchSelection | null;
   onChange: (selection: ResearchSelection | null) => void;
   onStart: (selection: ResearchSelection) => void;
+  loading?: boolean;
 };
 
-export function DisciplineSelector({ value, onChange, onStart }: Props) {
+export function DisciplineSelector({
+  value,
+  onChange,
+  onStart,
+  loading = false,
+}: Props) {
   const [inputValue, setInputValue] = useState(value?.label ?? "");
   useEffect(() => {
     if (value) setInputValue(value.label);
@@ -39,7 +45,7 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
   }, [normalizedInput]);
 
   function start() {
-    if (!resolvedSelection) return;
+    if (!resolvedSelection || loading) return;
     onChange(resolvedSelection);
     onStart(resolvedSelection);
   }
@@ -76,6 +82,7 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
             Choose a field or enter keywords
           </label>
           <form
+            aria-busy={loading}
             onSubmit={(event) => {
               event.preventDefault();
               start();
@@ -92,6 +99,7 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
               }}
               minLength={2}
               maxLength={120}
+              disabled={loading}
               autoComplete="off"
               aria-label="Choose a research field or enter keywords"
               placeholder="e.g. ecology or lake restoration"
@@ -108,14 +116,16 @@ export function DisciplineSelector({ value, onChange, onStart }: Props) {
               type="submit"
               size="lg"
               className="mt-4 h-12 w-full rounded-none bg-ink text-base text-paper hover:bg-accent-strong"
-              disabled={!resolvedSelection}
+              disabled={!resolvedSelection || loading}
             >
-              Start
-              <ArrowRight aria-hidden="true" />
+              {loading ? "Searching…" : "Start"}
+              {!loading && <ArrowRight aria-hidden="true" />}
             </Button>
           </form>
-          <p className="mt-3 text-sm leading-6 text-ink-muted">
-            Choose a suggestion, or keep your own keywords and press Start.
+          <p className="mt-3 text-sm leading-6 text-ink-muted" aria-live="polite">
+            {loading
+              ? `Searching for “${value?.label ?? normalizedInput}”…`
+              : "Choose a suggestion, or keep your own keywords and press Start."}
           </p>
           <p className="mt-4 text-sm leading-6 text-ink-muted">
             English and Chinese papers only. Papers are selected from OpenAlex

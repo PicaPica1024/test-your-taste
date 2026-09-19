@@ -27,6 +27,7 @@ export function GameApp() {
   const [shownIds, setShownIds] = useState<string[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [keepSelectorVisible, setKeepSelectorVisible] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const roundRef = useRef<Round | null>(null);
   const revealedRef = useRef(false);
@@ -167,11 +168,15 @@ export function GameApp() {
     return () => lifecycle.abort();
   }, []);
 
-  async function loadPaper(target = researchSelection) {
+  async function loadPaper(
+    target = researchSelection,
+    options?: { keepSelectorVisible?: boolean },
+  ) {
     if (!target) return;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
+    setKeepSelectorVisible(Boolean(options?.keepSelectorVisible));
     setScreen("loading");
     setRound(null);
     setRevealed(false);
@@ -200,6 +205,7 @@ export function GameApp() {
       }
       setRound(payload);
       setShownIds((current) => [...current, payload.paper.id].slice(-100));
+      setKeepSelectorVisible(false);
       setScreen("playing");
     } catch (error) {
       if ((error as Error).name !== "AbortError") {
@@ -208,6 +214,7 @@ export function GameApp() {
             ? error.message
             : "The paper request failed. Please try again.",
         );
+        setKeepSelectorVisible(false);
         setScreen("error");
       }
     }
@@ -243,15 +250,19 @@ export function GameApp() {
     setScreen("select");
     setRound(null);
     setRevealed(false);
+    setKeepSelectorVisible(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  if (screen === "select") {
+  if (screen === "select" || (screen === "loading" && keepSelectorVisible)) {
     return (
       <DisciplineSelector
         value={researchSelection}
         onChange={setResearchSelection}
-        onStart={loadPaper}
+        onStart={(target) =>
+          loadPaper(target, { keepSelectorVisible: true })
+        }
+        loading={screen === "loading"}
       />
     );
   }
