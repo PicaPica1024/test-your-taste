@@ -1,75 +1,58 @@
 # Test Your Taste
 
-Test Your Taste is a minimal scientific judgment game. Pick a field, read the year, title, and abstract of a real older paper, then guess its journal and current OpenAlex citation range. The journal and citation metadata are revealed only after both guesses are submitted.
+[中文说明](README.zh-CN.md)
 
-## Technology
+Think you can guess a paper's journal from its title and abstract? What about its citation range?
 
-- Next.js / Vinext, React, and TypeScript
-- Tailwind CSS
-- OpenAlex Topics and Works APIs (API key required in production)
-- Browser `localStorage` for session statistics and duplicate prevention
+**Test Your Taste** gives you a real research paper, hides the answer, and asks you to make both guesses. It is quick, slightly nerdy, and surprisingly hard.
 
-No database or player account is required. OpenAlex now requires an API key for
-production use; free keys are available from the OpenAlex account settings.
+[Play the live game](https://test-your-taste.zhujiangqiu.chatgpt.site/)
 
-## Run locally
+## What it does
 
-Requirements: Node.js 22.13 or newer.
+- Search by research field or your own keywords.
+- Show a real Chinese- or English-language paper from OpenAlex.
+- Ask you to guess the journal and citation range.
+- Reveal the answer and keep score locally in your browser.
 
-```bash
-npm ci
-npm run dev
-```
+No account or database is required.
 
-Open the local URL printed by the development server. A network connection is required while playing because papers and citation counts are retrieved from OpenAlex.
+## Use it as a skill
 
-Local development may use OpenAlex's small anonymous testing allowance. For a
-production deployment, configure `OPENALEX_API_KEY` as a secret environment
-variable. Do not commit the key to the repository or expose it to client code.
-
-For a production build:
-
-```bash
-npm run build
-npm start
-```
-
-## Install the Test Your Taste skill
-
-Codex users can add this repository as a plugin marketplace and install the skill:
+Install the public marketplace:
 
 ```bash
 codex plugin marketplace add PicaPica1024/test-your-taste --ref main
 codex plugin add testyourtaste@test-your-taste-local
 ```
 
-Start a new task, then run:
+Start a new Codex task, then run:
 
 ```text
 $testyourtaste "lake ecology, aquatic plants, restoration"
 ```
 
-Use `$testyourtaste help` for the complete usage guide. In ChatGPT interfaces that support plugin mentions, use `@testyourtaste` instead.
+Use `$testyourtaste help` for instructions. In ChatGPT interfaces that support plugin mentions, use `@testyourtaste` instead.
 
-## How the scholarly data works
+## Run it locally
 
-The server resolves each game field to one of several curated OpenAlex Topic labels, then requests works classified under the resolved Topic. Eligible papers must be articles or reviews, have a substantial reconstructable abstract, identify a journal, expose a citation count, and have been published at least ten years ago. Papers are sampled across four citation strata so the game is not limited to famous classics.
+Requires Node.js 22.13 or newer.
 
-Citation counts are the current `cited_by_count` returned by OpenAlex and therefore can change over time. The result view records the retrieval date.
+```bash
+npm ci
+npm run dev
+```
 
-## Configuration
+For production, add `OPENALEX_API_KEY` as a secret environment variable. Never commit the key.
 
-- `config/disciplines.ts` contains the user-facing field taxonomy and assigns every field to a journal-pool family.
-- `config/openAlexMappings.ts` contains the curated OpenAlex Topic search labels for each field.
-- `config/journalPools.ts` contains field-family journal pools, approximate reputation tiers, and establishment years used for plausible distractors.
-- `config/journalPrestige.ts` contains the fallback approximation for a retrieved journal not already present in its local pool.
+```bash
+npm run build
+npm start
+```
 
-The reputation tiers are editorial approximations for option ordering. They are not official CAS quartiles, impact factors, or a reproduction of Clarivate Web of Science categories.
+## A few notes
 
-## Known MVP limitations
-
-- OpenAlex topic classification, abstract coverage, and citation counts can contain source-data errors or omissions.
-- Journal distractors come from curated field-family pools; very niche papers may have less precise alternatives.
-- The game depends on OpenAlex availability and the configured API key's daily allowance.
-- Statistics and seen-paper IDs are device-local and limited to the current browser.
-- The current answer is kept in transient client state after retrieval so the no-database MVP can reveal instantly; it is hidden by the interface until submission but is not an anti-cheat system.
+- Citation counts come from OpenAlex and may change.
+- Journal alternatives are curated game choices, not official rankings.
+- Scores and seen-paper history stay in the current browser.
+- This is a lightweight guessing game, not an anti-cheat system.
