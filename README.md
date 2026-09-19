@@ -1,6 +1,6 @@
-# Test Your Taste：论文品味竞猜
+# Test Your Taste：测测你的科研品味
 
-只看标题和摘要，你能猜出论文发表在哪本期刊吗？引用量又能猜对吗？
+只看标题和摘要，你能猜出论文发表在哪本期刊，有多大的影响力吗？
 
 **Test Your Taste** 会找来一篇真实论文，把答案藏起来，让你猜期刊和引用量。规则很简单，但猜起来可能比想象中难。
 
@@ -23,10 +23,10 @@
 帮我从 PicaPica1024/test-your-taste 安装 testyourtaste 插件。
 ```
 
-Codex 会自动识别仓库中的插件市场；如果请求执行终端命令的权限，点击允许即可。安装后新建一个任务，然后输入：
+Codex 会自动识别仓库中的插件；如果请求执行终端命令的权限，点击允许即可。安装后新建一个任务，然后输入：
 
 ```text
-$testyourtaste "湖泊生态, 水生植物, 恢复"
+$testyourtaste "你感兴趣的关键词" 例如 $testyourtaste "biodiversity"
 ```
 
 输入 `$testyourtaste help` 可以查看帮助。在支持插件 `@` 调用的 ChatGPT 界面中，改用 `@testyourtaste`。
