@@ -1,0 +1,37 @@
+{
+  "name": "testyourtaste",
+  "version": "0.2.1+codex.20260919152553",
+  "description": "Turn research keywords into a real-paper guessing game, with built-in usage help.",
+  "author": {
+    "name": "Test Your Taste",
+    "url": "https://github.com/PicaPica1024"
+  },
+  "homepage": "https://test-your-taste.zhujiangqiu.chatgpt.site/",
+  "repository": "https://github.com/PicaPica1024/test-your-taste",
+  "keywords": [
+    "research",
+    "papers",
+    "journals",
+    "citations",
+    "education",
+    "game"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Test Your Taste",
+    "shortDescription": "Guess the journal and citations of a real paper.",
+    "longDescription": "Accept comma-separated research keywords, retrieve a matching Chinese- or English-language paper from the public Test Your Taste game, and present its year, title, abstract, six journal choices, and five citation-range choices without revealing the answers. Use @testyourtaste help for instructions.",
+    "developerName": "Test Your Taste",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "websiteURL": "https://test-your-taste.zhujiangqiu.chatgpt.site/",
+    "defaultPrompt": [
+      "@testyourtaste help",
+      "@testyourtaste \"\u6e56\u6cca\u751f\u6001, \u6c34\u751f\u690d\u7269, \u6062\u590d\"",
+      "@testyourtaste \"machine learning, protein structure\""
+    ],
+    "brandColor": "#2F6F98"
+  }
+}

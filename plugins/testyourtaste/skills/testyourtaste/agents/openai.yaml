@@ -1,0 +1,7 @@
+interface:
+  display_name: "Test Your Taste"
+  short_description: "用关键词生成真实论文猜期刊与引用量游戏"
+  default_prompt: "Use $testyourtaste with comma-separated keywords to show a paper's year, title, abstract, and two multiple-choice questions."
+
+policy:
+  allow_implicit_invocation: true

@@ -34,6 +34,23 @@ npm run build
 npm start
 ```
 
+## Install the Test Your Taste skill
+
+Codex users can add this repository as a plugin marketplace and install the skill:
+
+```bash
+codex plugin marketplace add PicaPica1024/test-your-taste --ref main
+codex plugin add testyourtaste@test-your-taste-local
+```
+
+Start a new task, then run:
+
+```text
+$testyourtaste "lake ecology, aquatic plants, restoration"
+```
+
+Use `$testyourtaste help` for the complete usage guide. In ChatGPT interfaces that support plugin mentions, use `@testyourtaste` instead.
+
 ## How the scholarly data works
 
 The server resolves each game field to one of several curated OpenAlex Topic labels, then requests works classified under the resolved Topic. Eligible papers must be articles or reviews, have a substantial reconstructable abstract, identify a journal, expose a citation count, and have been published at least ten years ago. Papers are sampled across four citation strata so the game is not limited to famous classics.
