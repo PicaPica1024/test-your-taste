@@ -144,9 +144,6 @@ export function DisciplineSelector({
           >
             {careerStages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
           </select>
-          <p className="mt-4 text-sm leading-6 text-ink-muted">
-            这个测试不会获得你的任何个人信息
-          </p>
         </div>
       </section>
     </main>
