@@ -78,7 +78,7 @@ export function DisciplineSelector({
             Taste<span className="text-accent-strong">.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-ink-muted sm:text-xl">
-            英雄不问出处，隐去作者和期刊，仅凭发表年份，标题和摘要，你能判断出发表档次和影响力吗？
+            英雄不问出处，隐去作者和期刊，仅凭发表年份、标题和摘要，你能判断出它发表在哪里，又产生了多大影响吗？
           </p>
         </div>
 

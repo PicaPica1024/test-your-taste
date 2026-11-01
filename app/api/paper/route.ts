@@ -2,6 +2,7 @@ import { disciplinesBySlug } from "@/config/disciplines";
 import { getDb } from "@/db";
 import { gameRounds } from "@/db/schema";
 import { OpenAlexError } from "@/lib/openalex";
+import { buildJournalOptions, inferPoolKey } from "@/lib/journalOptions";
 import { findRound, findRoundByKeyword } from "@/lib/paperSampler";
 import { venueTiers, type VenueTierId } from "@/lib/types";
 import { NextResponse } from "next/server";
@@ -42,6 +43,11 @@ export async function POST(request: Request) {
     const generated = discipline
       ? await findRound(discipline, requestedTier, excludedIds, request.signal)
       : await findRoundByKeyword(keyword, requestedTier, excludedIds, request.signal);
+    const journalOptions = buildJournalOptions(
+      generated.answer.journal,
+      generated.answer.venueTier,
+      discipline?.poolKey ?? inferPoolKey(keyword),
+    );
     const roundId = crypto.randomUUID();
     await getDb().insert(gameRounds).values({
       id: roundId,
@@ -64,7 +70,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { roundId, paper: generated.paper, requestedTier },
+      { roundId, paper: generated.paper, requestedTier, journalOptions },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

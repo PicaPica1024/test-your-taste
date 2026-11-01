@@ -1,6 +1,6 @@
 interface:
   display_name: "Test Your Taste"
-  short_description: "看真实论文，猜发表档次与引用量"
+  short_description: "看真实论文，猜期刊与引用量"
   default_prompt: "使用 $testyourtaste 按关键词开始科研品味竞猜；输入 help 查看说明，输入 ai 可让模型闭卷自测。"
 
 policy:

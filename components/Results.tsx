@@ -5,7 +5,7 @@ import { BenchmarkStats } from "./BenchmarkStats";
 
 type Props = {
   result: RoundResult;
-  venueGuess: VenueTierId;
+  journalGuess: string;
   citationGuess: CitationRangeId;
   benchmark: BenchmarkSummary[];
   onNext: () => void;
@@ -14,7 +14,7 @@ type Props = {
 
 const tierLabel = (id: VenueTierId) => venueTiers.find((tier) => tier.id === id)?.label ?? id;
 
-export function Results({ result, venueGuess, citationGuess, benchmark, onNext, onChangeField }: Props) {
+export function Results({ result, journalGuess, citationGuess, benchmark, onNext, onChangeField }: Props) {
   const retrieved = new Intl.DateTimeFormat("zh-CN", {
     year: "numeric",
     month: "short",
@@ -30,13 +30,13 @@ export function Results({ result, venueGuess, citationGuess, benchmark, onNext, 
       </div>
       <div className="grid gap-px bg-ink/15 sm:grid-cols-2">
         <div className="bg-surface p-5 sm:p-7">
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-ink-muted">发表档次</p>
-          <p className={`mt-3 text-sm font-semibold ${result.venueCorrect ? "text-correct-strong" : "text-wrong-strong"}`}>
-            {result.venueCorrect ? "答对了" : "不太对"}
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-ink-muted">期刊或会议</p>
+          <p className={`mt-3 text-sm font-semibold ${result.journalCorrect ? "text-correct-strong" : "text-wrong-strong"}`}>
+            {result.journalCorrect ? "答对了" : "不太对"}
           </p>
-          {!result.venueCorrect && <p className="mt-2 text-sm leading-6 text-ink-muted">你的答案：{tierLabel(venueGuess)}</p>}
-          <p className="mt-1 font-serif text-xl leading-7 text-ink">{tierLabel(result.actualVenueTier)}</p>
-          <p className="mt-2 text-sm leading-6 text-ink-muted">实际来源：{result.actualJournal}</p>
+          {!result.journalCorrect && <p className="mt-2 text-sm leading-6 text-ink-muted">你的答案：{journalGuess}</p>}
+          <p className="mt-1 font-serif text-xl leading-7 text-ink">{result.actualJournal}</p>
+          <p className="mt-2 text-sm leading-6 text-ink-muted">项目归类：{tierLabel(result.actualVenueTier)}</p>
           <p className="mt-2 text-xs leading-5 text-ink-muted">{result.classificationNote}</p>
         </div>
         <div className="bg-surface p-5 sm:p-7">

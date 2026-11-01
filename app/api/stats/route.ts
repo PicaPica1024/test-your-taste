@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       .select({
         playerType: gameAnswers.playerType,
         answers: sql<number>`count(*)`,
-        venueCorrect: sql<number>`coalesce(sum(case when ${gameAnswers.venueCorrect} = 1 then 1 else 0 end), 0)`,
+        journalCorrect: sql<number>`coalesce(sum(case when ${gameAnswers.journalCorrect} = 1 then 1 else 0 end), 0)`,
         citationCorrect: sql<number>`coalesce(sum(case when ${gameAnswers.citationCorrect} = 1 then 1 else 0 end), 0)`,
       })
       .from(gameAnswers)
@@ -26,6 +26,7 @@ export async function GET(request: Request) {
         eq(gameRounds.disciplineSlug, slug),
         eq(gameRounds.benchmarkEligible, true),
         eq(gameAnswers.skipped, false),
+        eq(gameAnswers.answerMode, "journal-v2"),
       ))
       .groupBy(gameAnswers.playerType);
     const summaries: BenchmarkSummary[] = rows
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
       .map((row) => ({
         playerType: row.playerType as "human" | "ai",
         answers: Number(row.answers),
-        venueCorrect: Number(row.venueCorrect),
+        journalCorrect: Number(row.journalCorrect),
         citationCorrect: Number(row.citationCorrect),
       }));
     return NextResponse.json({ discipline: slug, summaries }, { headers: { "Cache-Control": "no-store" } });

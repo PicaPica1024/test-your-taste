@@ -1,7 +1,7 @@
 {
   "name": "testyourtaste",
-  "version": "0.3.1+codex.20261101205242",
-  "description": "根据研究关键词生成真实论文的发表档次与引用量竞猜，并支持人类与 AI 分开计分。",
+  "version": "0.4.0+codex.20261101213100",
+  "description": "根据研究关键词生成真实论文的期刊与引用量竞猜，并支持人类与 AI 分开计分。",
   "author": {
     "name": "Test Your Taste",
     "url": "https://github.com/PicaPica1024"
@@ -12,8 +12,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Test Your Taste",
-    "shortDescription": "看真实论文，猜发表档次和引用量",
-    "longDescription": "输入研究关键词，从公开游戏中获取匹配的中文或英文论文。先确认自己没读过，再根据年份、标题和摘要判断五档发表层级与引用量；普通玩家和 AI 闭卷自测分开统计。输入 @testyourtaste help 可查看说明。",
+    "shortDescription": "看真实论文，猜期刊和引用量",
+    "longDescription": "输入研究关键词，从公开游戏中获取匹配的中文或英文论文。先确认自己没读过，再根据年份、标题和摘要判断期刊或会议与引用量；普通玩家和 AI 闭卷自测分开统计。输入 @testyourtaste help 可查看说明。",
     "developerName": "Test Your Taste",
     "category": "Productivity",
     "capabilities": ["Interactive"],

@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Test Your Taste",
   description:
-    "只看年份、标题和摘要，猜真实论文的发表档次与引用量。",
+    "只看年份、标题和摘要，猜真实论文的期刊或会议与引用量。",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

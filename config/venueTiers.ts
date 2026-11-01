@@ -310,7 +310,7 @@ export function classificationNote(tier: VenueTierId) {
     return "依据项目维护的综合顶刊、旗舰子刊、医学综合顶刊与计算机顶会白名单。";
   }
   if (tier === "field-top") {
-    return "依据项目按学科维护的领域顶刊名单。";
+    return "依据学术声誉、领域认可、选择性与发表规模等因素综合维护的领域顶级来源名单，不以单一影响因子决定。";
   }
   if (tier === "q1") {
     return "依据项目维护的普通 JCR Q1 映射；旗舰刊和领域顶刊优先归入更高档。";

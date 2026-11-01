@@ -5,7 +5,7 @@ export function ScoreBar({ stats }: { stats: SessionStats }) {
   const items = [
     { label: "得分", value: `${stats.points} / ${stats.papersPlayed * 2}` },
     { label: "论文", value: String(stats.papersPlayed) },
-    { label: "档次", value: `${percentage(stats.venueCorrect, stats.papersPlayed)}%` },
+    { label: "期刊", value: `${percentage(stats.journalCorrect, stats.papersPlayed)}%` },
     { label: "引用量", value: `${percentage(stats.citationCorrect, stats.papersPlayed)}%` },
     { label: "连胜", value: String(stats.streak) },
   ];

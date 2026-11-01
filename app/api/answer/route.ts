@@ -1,9 +1,9 @@
 import { getDb } from "@/db";
 import { gameAnswers, gameRounds } from "@/db/schema";
+import { sameJournal } from "@/lib/journalOptions";
 import {
   careerStages,
   citationRanges,
-  venueTiers,
   type CareerStageId,
   type CitationRangeId,
   type PlayerType,
@@ -15,7 +15,6 @@ import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
-const tierIds = new Set<string>(venueTiers.map((item) => item.id));
 const rangeIds = new Set<string>(citationRanges.map((item) => item.id));
 const stageIds = new Set<string>(careerStages.map((item) => item.id));
 
@@ -28,9 +27,9 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Record<string, unknown>;
     const roundId = typeof body.roundId === "string" ? body.roundId : "";
     const participantId = participant(body.participantId);
-    const venueGuess = typeof body.venueTier === "string" && tierIds.has(body.venueTier)
-      ? (body.venueTier as VenueTierId)
-      : null;
+    const journalGuess = typeof body.journal === "string"
+      ? body.journal.normalize("NFKC").replace(/\s+/g, " ").trim().slice(0, 240)
+      : "";
     const citationGuess = typeof body.citationRange === "string" && rangeIds.has(body.citationRange)
       ? (body.citationRange as CitationRangeId)
       : null;
@@ -38,7 +37,7 @@ export async function POST(request: Request) {
     const careerStage = typeof body.careerStage === "string" && stageIds.has(body.careerStage)
       ? (body.careerStage as CareerStageId)
       : null;
-    if (!roundId || !participantId || !venueGuess || !citationGuess) {
+    if (!roundId || !participantId || !journalGuess || !citationGuess) {
       return NextResponse.json({ error: "The answer is incomplete." }, { status: 400 });
     }
 
@@ -46,7 +45,7 @@ export async function POST(request: Request) {
     const round = await db.query.gameRounds.findFirst({ where: eq(gameRounds.id, roundId) });
     if (!round) return NextResponse.json({ error: "Round not found." }, { status: 404 });
 
-    const venueCorrect = venueGuess === round.actualVenueTier;
+    const journalCorrect = sameJournal(journalGuess, round.journal);
     const citationCorrect = citationGuess === round.citationRange;
     await db.insert(gameAnswers).values({
       roundId,
@@ -54,16 +53,17 @@ export async function POST(request: Request) {
       playerType,
       careerStage,
       familiarity: "new",
-      venueGuess,
+      answerMode: "journal-v2",
+      journalGuess,
       citationGuess,
-      venueCorrect,
+      journalCorrect,
       citationCorrect,
       skipped: false,
     }).onConflictDoNothing();
 
     const result: RoundResult = {
-      score: Number(venueCorrect) + Number(citationCorrect),
-      venueCorrect,
+      score: Number(journalCorrect) + Number(citationCorrect),
+      journalCorrect,
       citationCorrect,
       actualJournal: round.journal,
       actualVenueTier: round.actualVenueTier as VenueTierId,

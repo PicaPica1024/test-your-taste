@@ -15,7 +15,7 @@ export const venueTiers = [
   {
     id: "field-top",
     label: "领域顶刊",
-    description: "该学科公认的顶级专业期刊",
+    description: "综合学术声誉、领域认可、选择性与发表规模等因素策展的顶级专业来源",
   },
   {
     id: "q1",
@@ -74,11 +74,12 @@ export type Round = {
   roundId: string;
   paper: PaperPrompt;
   requestedTier: VenueTierId;
+  journalOptions: string[];
 };
 
 export type RoundResult = {
   score: number;
-  venueCorrect: boolean;
+  journalCorrect: boolean;
   citationCorrect: boolean;
   actualJournal: string;
   actualVenueTier: VenueTierId;
@@ -92,7 +93,7 @@ export type RoundResult = {
 export type SessionStats = {
   points: number;
   papersPlayed: number;
-  venueCorrect: number;
+  journalCorrect: number;
   citationCorrect: number;
   streak: number;
 };
@@ -100,6 +101,6 @@ export type SessionStats = {
 export type BenchmarkSummary = {
   playerType: PlayerType;
   answers: number;
-  venueCorrect: number;
+  journalCorrect: number;
   citationCorrect: number;
 };

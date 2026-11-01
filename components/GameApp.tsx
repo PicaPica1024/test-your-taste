@@ -24,10 +24,10 @@ import { FamiliarityCheck } from "./FamiliarityCheck";
 import { PaperCard } from "./PaperCard";
 import { Results } from "./Results";
 import { ScoreBar } from "./ScoreBar";
-import { VenueTierQuiz } from "./VenueTierQuiz";
+import { JournalQuiz } from "./JournalQuiz";
 
-const STORAGE_KEY = "test-your-taste:session:v2";
-const emptyStats: SessionStats = { points: 0, papersPlayed: 0, venueCorrect: 0, citationCorrect: 0, streak: 0 };
+const STORAGE_KEY = "test-your-taste:session:v3";
+const emptyStats: SessionStats = { points: 0, papersPlayed: 0, journalCorrect: 0, citationCorrect: 0, streak: 0 };
 type Screen = "select" | "loading" | "playing" | "error";
 type Phase = "familiarity" | "quiz" | "revealed";
 
@@ -52,7 +52,7 @@ export function GameApp() {
   const [tierQueue, setTierQueue] = useState<VenueTierId[]>(() => venueTiers.map((tier) => tier.id));
   const [round, setRound] = useState<Round | null>(null);
   const [phase, setPhase] = useState<Phase>("familiarity");
-  const [venueGuess, setVenueGuess] = useState<VenueTierId | null>(null);
+  const [journalGuess, setJournalGuess] = useState<string | null>(null);
   const [citationGuess, setCitationGuess] = useState<CitationRangeId | null>(null);
   const [result, setResult] = useState<RoundResult | null>(null);
   const [stats, setStats] = useState<SessionStats>(emptyStats);
@@ -175,7 +175,7 @@ export function GameApp() {
     roundRef.current = null;
     setPhase("familiarity");
     phaseRef.current = "familiarity";
-    setVenueGuess(null);
+    setJournalGuess(null);
     setCitationGuess(null);
     setResult(null);
     setErrorMessage(null);
@@ -256,7 +256,7 @@ export function GameApp() {
     return summaries;
   }
 
-  async function submitGuesses(venue: VenueTierId, citation: CitationRangeId, playerType: PlayerType = "human") {
+  async function submitGuesses(journal: string, citation: CitationRangeId, playerType: PlayerType = "human") {
     const currentRound = roundRef.current;
     if (!currentRound || phaseRef.current !== "quiz") throw new Error("There is no unanswered paper");
     setBusy(true);
@@ -269,7 +269,7 @@ export function GameApp() {
           participantId: currentParticipantId(),
           playerType,
           careerStage: careerStageRef.current,
-          venueTier: venue,
+          journal,
           citationRange: citation,
         }),
       });
@@ -277,7 +277,7 @@ export function GameApp() {
       if (!response.ok || !("actualJournal" in payload)) {
         throw new Error("error" in payload && payload.error ? payload.error : "Could not submit the answer");
       }
-      setVenueGuess(venue);
+      setJournalGuess(journal);
       setCitationGuess(citation);
       setResult(payload);
       setPhase("revealed");
@@ -285,9 +285,9 @@ export function GameApp() {
       setStats((current) => ({
         points: current.points + payload.score,
         papersPlayed: current.papersPlayed + 1,
-        venueCorrect: current.venueCorrect + Number(payload.venueCorrect),
+        journalCorrect: current.journalCorrect + Number(payload.journalCorrect),
         citationCorrect: current.citationCorrect + Number(payload.citationCorrect),
-        streak: payload.venueCorrect && payload.citationCorrect ? current.streak + 1 : 0,
+        streak: payload.journalCorrect && payload.citationCorrect ? current.streak + 1 : 0,
       }));
       consumeTier();
       await fetchBenchmark(selectionRef.current);
@@ -339,7 +339,7 @@ export function GameApp() {
       Promise.resolve(context.registerTool({
         name: "confirm_paper_familiarity",
         title: "确认是否读过论文",
-        description: "确认用户没读过后开放选项；若读过或不确定，则换一篇同档次论文且不计分。",
+        description: "确认用户没读过后开放选项；若读过或不确定，则换一篇论文且不计分。",
         inputSchema: {
           type: "object",
           properties: { familiarity: { type: "string", enum: ["new", "read", "unsure"] } },
@@ -358,7 +358,7 @@ export function GameApp() {
           phaseRef.current = "quiz";
           return {
             status: "ready_for_guess",
-            venueOptions: venueTiers.map((item) => ({ id: item.id, label: item.label, description: item.description })),
+            journalOptions: roundRef.current.journalOptions,
             citationOptions: citationRanges.map((item) => ({ id: item.id, label: item.label })),
           };
         },
@@ -366,25 +366,27 @@ export function GameApp() {
       Promise.resolve(context.registerTool({
         name: "submit_taste_guess",
         title: "提交科研品味判断",
-        description: "提交发表档次与引用量区间，随后由服务器公布答案。普通互动游戏使用 human；仅在 AI 自己闭卷作答时使用 ai。",
+        description: "提交期刊或会议名称与引用量区间，随后由服务器公布答案。普通互动游戏使用 human；仅在 AI 自己闭卷作答时使用 ai。",
         inputSchema: {
           type: "object",
           properties: {
-            venueTier: { type: "string", enum: venueTiers.map((tier) => tier.id) },
+            journal: { type: "string", description: "必须是当前可见选项中的完整期刊或会议名称。" },
             citationRange: { type: "string", enum: citationRanges.map((range) => range.id) },
             playerType: { type: "string", enum: ["human", "ai"] },
           },
-          required: ["venueTier", "citationRange"],
+          required: ["journal", "citationRange"],
           additionalProperties: false,
         },
         annotations: { readOnlyHint: false, untrustedContentHint: false },
         async execute(input) {
-          const guess = input as { venueTier?: unknown; citationRange?: unknown; playerType?: unknown };
-          const venue = venueTiers.find((item) => item.id === guess.venueTier)?.id;
+          const guess = input as { journal?: unknown; citationRange?: unknown; playerType?: unknown };
+          const journal = typeof guess.journal === "string" && roundRef.current?.journalOptions.includes(guess.journal)
+            ? guess.journal
+            : null;
           const citation = citationRanges.find((item) => item.id === guess.citationRange)?.id;
-          if (!venue || !citation) throw new Error("Both guesses must use visible option ids");
+          if (!journal || !citation) throw new Error("Both guesses must use visible options");
           const playerType: PlayerType = guess.playerType === "ai" ? "ai" : "human";
-          return submitGuesses(venue, citation, playerType);
+          return submitGuesses(journal, citation, playerType);
         },
       }, { signal: lifecycle.signal })),
     ]).catch((error) => {
@@ -443,13 +445,12 @@ export function GameApp() {
 
       <main className="mx-auto w-full max-w-[1160px] px-5 py-7 sm:px-8 sm:py-10 lg:px-12">
         <ScoreBar stats={stats} />
-        <p className="mt-3 text-right text-xs text-ink-muted">随机五轮一组 · 五个档次各一次</p>
         {screen === "loading" && <LoadingPaper />}
         {screen === "error" && (
           <section className="mx-auto grid min-h-[55vh] max-w-xl place-items-center text-center">
             <div>
               <p className="mb-3 text-sm font-bold uppercase tracking-[0.15em] text-accent-strong">检索暂时停住了</p>
-              <h1 className="font-serif text-4xl text-ink">没有找到符合本轮档次的论文</h1>
+              <h1 className="font-serif text-4xl text-ink">没有找到适合本轮的论文</h1>
               <p className="mt-4 text-base leading-7 text-ink-muted">{errorMessage ?? "数据源可能正忙，请重试。"} 本轮不计分。</p>
               <div className="mt-7 flex justify-center gap-3">
                 <Button variant="outline" className="rounded-none" onClick={changeField}>更换主题</Button>
@@ -473,7 +474,7 @@ export function GameApp() {
             )}
             {(phase === "quiz" || phase === "revealed") && (
               <>
-                <VenueTierQuiz value={venueGuess} onChange={setVenueGuess} revealed={phase === "revealed"} actual={result?.actualVenueTier} />
+                <JournalQuiz options={round.journalOptions} value={journalGuess} onChange={setJournalGuess} revealed={phase === "revealed"} actual={result?.actualJournal} />
                 <CitationQuiz value={citationGuess} onChange={setCitationGuess} revealed={phase === "revealed"} actual={result?.actualCitationRange} />
               </>
             )}
@@ -482,18 +483,18 @@ export function GameApp() {
                 <Button
                   size="lg"
                   className="h-12 w-full rounded-none bg-ink px-10 text-base text-paper hover:bg-accent-strong sm:w-auto"
-                  disabled={!venueGuess || !citationGuess || busy}
-                  onClick={() => venueGuess && citationGuess && void submitGuesses(venueGuess, citationGuess).catch((error) => setErrorMessage(error instanceof Error ? error.message : "提交失败，请重试"))}
+                  disabled={!journalGuess || !citationGuess || busy}
+                  onClick={() => journalGuess && citationGuess && void submitGuesses(journalGuess, citationGuess).catch((error) => setErrorMessage(error instanceof Error ? error.message : "提交失败，请重试"))}
                 >
                   {busy ? "正在提交…" : "公布答案"}
                 </Button>
               </div>
             )}
             {phase === "quiz" && errorMessage && <p className="-mt-8 mb-10 text-right text-sm text-wrong-strong">{errorMessage}</p>}
-            {phase === "revealed" && result && venueGuess && citationGuess && (
+            {phase === "revealed" && result && journalGuess && citationGuess && (
               <Results
                 result={result}
-                venueGuess={venueGuess}
+                journalGuess={journalGuess}
                 citationGuess={citationGuess}
                 benchmark={benchmark}
                 onNext={() => void loadPaper().catch(() => undefined)}
