@@ -6,9 +6,15 @@ export const metadata: Metadata = {
   description: "了解 Test Your Taste 的初衷、目的与本次更新。",
 };
 
-const updates = [
-  "新版按照期刊的综合质量均匀分配论文抽取机会，再从对应范围内寻找论文。",
-  "降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。",
+const releaseNotes = [
+  {
+    date: "2026-11-01",
+    label: "2026 年 11 月 1 日",
+    items: [
+      "新版按照期刊的综合质量均匀分配论文抽取机会，再从对应范围内寻找论文。",
+      "降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。",
+    ],
+  },
 ] as const;
 
 export default function AboutPage() {
@@ -48,15 +54,24 @@ export default function AboutPage() {
         </section>
 
         <section className="border-b border-ink/15 py-14">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">02 · 本次更新</p>
-          <ol className="mt-5 border-y border-ink/15">
-            {updates.map((copy, index) => (
-              <li key={copy} className="grid gap-3 border-b border-ink/15 py-6 last:border-b-0 sm:grid-cols-[3rem_1fr] sm:items-start">
-                <span className="font-serif text-3xl text-accent-strong">{index + 1}</span>
-                <p className="text-base leading-8 text-ink-muted">{copy}</p>
-              </li>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">02 · 版本记录</p>
+          <div className="mt-5 space-y-10">
+            {releaseNotes.map((release) => (
+              <section key={release.date} aria-labelledby={`release-${release.date}`}>
+                <time id={`release-${release.date}`} dateTime={release.date} className="font-serif text-2xl text-ink">
+                  {release.label}
+                </time>
+                <ol className="mt-4 border-y border-ink/15">
+                  {release.items.map((copy, index) => (
+                    <li key={copy} className="grid gap-3 border-b border-ink/15 py-6 last:border-b-0 sm:grid-cols-[3rem_1fr] sm:items-start">
+                      <span className="font-serif text-3xl text-accent-strong">{index + 1}</span>
+                      <p className="text-base leading-8 text-ink-muted">{copy}</p>
+                    </li>
+                  ))}
+                </ol>
+              </section>
             ))}
-          </ol>
+          </div>
         </section>
 
         <Link href="/" className="my-14 inline-flex border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</Link>
