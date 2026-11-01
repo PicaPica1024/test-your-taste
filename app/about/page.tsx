@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- full-page navigation avoids a client-router failure in the hosted runtime */
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "关于 · Test Your Taste",
@@ -22,11 +22,11 @@ export default function AboutPage() {
     <main className="min-h-screen bg-paper text-ink">
       <header className="sticky top-0 z-30 border-b border-ink/15 bg-paper/95 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-[1080px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <Link href="/" className="flex items-center gap-3">
+          <a href="/" className="flex items-center gap-3">
             <span className="grid size-8 place-items-center border border-ink/25 font-serif">T²</span>
             <span className="font-serif text-lg font-semibold">Test Your Taste</span>
-          </Link>
-          <Link href="/" className="text-sm font-semibold text-accent-strong hover:underline">返回游戏</Link>
+          </a>
+          <a href="/" className="touch-manipulation text-sm font-semibold text-accent-strong hover:underline">返回游戏</a>
         </div>
       </header>
 
@@ -74,7 +74,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <Link href="/" className="my-14 inline-flex border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</Link>
+        <a href="/" className="my-14 inline-flex touch-manipulation border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</a>
       </article>
     </main>
   );

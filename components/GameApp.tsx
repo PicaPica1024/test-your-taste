@@ -17,7 +17,6 @@ import {
   type VenueTierId,
 } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { CitationQuiz } from "./CitationQuiz";
 import { DisciplineSelector, type ResearchSelection } from "./DisciplineSelector";
 import { FamiliarityCheck } from "./FamiliarityCheck";
@@ -438,7 +437,7 @@ export function GameApp() {
           </button>
           <div className="flex min-w-0 items-center gap-4">
             <button onClick={changeField} className="max-w-[38vw] truncate text-sm font-semibold text-accent-strong hover:underline">{researchSelection?.label}</button>
-            <Link href="/about" className="shrink-0 text-sm font-semibold text-ink-muted hover:text-accent-strong hover:underline">关于</Link>
+            <a href="/about" className="shrink-0 touch-manipulation text-sm font-semibold text-ink-muted hover:text-accent-strong hover:underline">关于</a>
           </div>
         </div>
       </header>
