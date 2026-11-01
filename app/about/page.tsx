@@ -7,10 +7,10 @@ export const metadata: Metadata = {
 };
 
 const updates = [
-  ["更像真实判断", "第一题不再展示抽象档次，而是给出五个具体的期刊或会议名称。"],
-  ["每轮重新排布", "五个备选名称的展示顺序每轮都会重新打乱，避免位置形成提示。"],
-  ["保留影响力判断", "第二题继续竞猜论文目前的引用量区间，提交后同时公布真实来源和引用数据。"],
-  ["说明更聚焦", "“关于”页不再罗列期刊分类，只解释游戏为什么存在、希望测试什么。"],
+  ["第一版的问题", "如果直接从全部论文中抽取，发文量大的期刊会因为候选论文更多而更容易出现。"],
+  ["新版抽取方式", "新版会按照期刊的综合质量均匀分配抽取机会，再从对应范围内寻找论文。"],
+  ["减少数量偏向", "这样可以降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。"],
+  ["题目更直接", "第一题从猜抽象档次改为选择具体的期刊或会议，第二题继续判断引用量区间。"],
 ] as const;
 
 export default function AboutPage() {
@@ -51,7 +51,7 @@ export default function AboutPage() {
 
         <section className="border-b border-ink/15 py-14">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">02 · 本次更新</p>
-          <h2 className="mt-3 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">从猜抽象档次，改为直接猜期刊或会议</h2>
+          <h2 className="mt-3 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">相比第一版，让不同期刊获得更均衡的出现机会</h2>
           <div className="mt-8 grid gap-px bg-ink/15 sm:grid-cols-2">
             {updates.map(([title, copy]) => (
               <div key={title} className="bg-surface p-5 sm:p-6">
@@ -62,20 +62,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="grid gap-8 py-14 lg:grid-cols-2">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">03 · 想测试什么</p>
-            <h2 className="mt-3 font-serif text-3xl">研究内容的判断力</h2>
-            <p className="mt-5 text-sm leading-7 text-ink-muted">题目希望测试你对研究问题的重要性、故事的完整性、方法与结论之间的匹配，以及工作可能打开哪些新问题的直觉。</p>
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">04 · 不想替代什么</p>
-            <h2 className="mt-3 font-serif text-3xl">同行评议与专业评价</h2>
-            <p className="mt-5 text-sm leading-7 text-ink-muted">期刊声誉和引用量只是研究影响的部分侧面，不能等同于研究质量。游戏成绩适合用来反思自己的判断习惯，不适合用来评价某篇论文、某个研究者或某个学科。</p>
-          </div>
-        </section>
-
-        <Link href="/" className="mb-14 inline-flex border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</Link>
+        <Link href="/" className="my-14 inline-flex border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</Link>
       </article>
     </main>
   );
