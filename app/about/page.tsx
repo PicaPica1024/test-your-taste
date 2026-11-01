@@ -7,10 +7,9 @@ export const metadata: Metadata = {
 };
 
 const updates = [
-  ["第一版的问题", "如果直接从全部论文中抽取，发文量大的期刊会因为候选论文更多而更容易出现。"],
-  ["新版抽取方式", "新版会按照期刊的综合质量均匀分配抽取机会，再从对应范围内寻找论文。"],
-  ["减少数量偏向", "这样可以降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。"],
-  ["题目更直接", "第一题从猜抽象档次改为选择具体的期刊或会议，第二题继续判断引用量区间。"],
+  "相比第一版，第一题由猜抽象档次改为从五个具体的期刊或会议名称中选择。",
+  "新版按照期刊的综合质量均匀分配论文抽取机会，再从对应范围内寻找论文。",
+  "降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。",
 ] as const;
 
 export default function AboutPage() {
@@ -52,14 +51,14 @@ export default function AboutPage() {
         <section className="border-b border-ink/15 py-14">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">02 · 本次更新</p>
           <h2 className="mt-3 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">相比第一版，让不同期刊获得更均衡的出现机会</h2>
-          <div className="mt-8 grid gap-px bg-ink/15 sm:grid-cols-2">
-            {updates.map(([title, copy]) => (
-              <div key={title} className="bg-surface p-5 sm:p-6">
-                <h3 className="font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-ink-muted">{copy}</p>
-              </div>
+          <ol className="mt-8 border-y border-ink/15">
+            {updates.map((copy, index) => (
+              <li key={copy} className="grid gap-3 border-b border-ink/15 py-6 last:border-b-0 sm:grid-cols-[3rem_1fr] sm:items-start">
+                <span className="font-serif text-3xl text-accent-strong">{index + 1}</span>
+                <p className="text-base leading-8 text-ink-muted">{copy}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
         <Link href="/" className="my-14 inline-flex border border-ink bg-ink px-5 py-3 text-sm font-semibold text-paper hover:bg-accent-strong">开始游戏</Link>
