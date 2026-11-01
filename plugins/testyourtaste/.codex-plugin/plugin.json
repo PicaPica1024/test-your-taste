@@ -1,6 +1,6 @@
 {
   "name": "testyourtaste",
-  "version": "0.3.0+codex.20261101203527",
+  "version": "0.3.1+codex.20261101205242",
   "description": "根据研究关键词生成真实论文的发表档次与引用量竞猜，并支持人类与 AI 分开计分。",
   "author": {
     "name": "Test Your Taste",

@@ -46,7 +46,7 @@ function publicPrompt(round: Round) {
 export function GameApp() {
   const [screen, setScreen] = useState<Screen>("select");
   const [researchSelection, setResearchSelection] = useState<ResearchSelection | null>(null);
-  const [careerStage, setCareerStage] = useState<CareerStageId>("other");
+  const [careerStage, setCareerStage] = useState<CareerStageId>("prefer-not-say");
   const [participantId, setParticipantId] = useState("");
   const [tierQueue, setTierQueue] = useState<VenueTierId[]>(() => venueTiers.map((tier) => tier.id));
   const [round, setRound] = useState<Round | null>(null);
@@ -66,7 +66,7 @@ export function GameApp() {
   const roundRef = useRef<Round | null>(null);
   const phaseRef = useRef<Phase>("familiarity");
   const selectionRef = useRef<ResearchSelection | null>(null);
-  const careerStageRef = useRef<CareerStageId>("other");
+  const careerStageRef = useRef<CareerStageId>("prefer-not-say");
   const participantRef = useRef("");
   const tierQueueRef = useRef<VenueTierId[]>(venueTiers.map((tier) => tier.id));
   const shownIdsRef = useRef<string[]>([]);

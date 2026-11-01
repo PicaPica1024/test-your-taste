@@ -35,11 +35,13 @@ export const venueTiers = [
 ] as const;
 
 export const careerStages = [
+  { id: "undergraduate", label: "本科生" },
   { id: "masters", label: "硕士生" },
   { id: "phd", label: "博士生" },
   { id: "post-phd-0-5", label: "博士毕业 5 年内" },
   { id: "post-phd-5-plus", label: "博士毕业 5 年后" },
-  { id: "other", label: "其他 / 暂不填写" },
+  { id: "other", label: "其他" },
+  { id: "prefer-not-say", label: "不愿透露" },
 ] as const;
 
 export type CitationRangeId = (typeof citationRanges)[number]["id"];

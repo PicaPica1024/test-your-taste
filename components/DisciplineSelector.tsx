@@ -76,9 +76,6 @@ export function DisciplineSelector({
         </div>
 
         <div className="border-t-2 border-ink pt-7 lg:mb-1">
-          <p className="mb-8 max-w-md font-serif text-2xl leading-9 text-ink">
-            每五轮覆盖五个档次，顺序随机。猜发表档次，也猜引用量。
-          </p>
           <label className="mb-3 block text-sm font-semibold text-ink" htmlFor="field-search">
             选择学科或输入关键词
           </label>
@@ -123,13 +120,13 @@ export function DisciplineSelector({
               {!loading && <ArrowRight aria-hidden="true" />}
             </Button>
           </form>
-          <p className="mt-3 text-sm leading-6 text-ink-muted" aria-live="polite">
-            {loading
-              ? `正在检索“${value?.label ?? normalizedInput}”…`
-              : "选择预设学科可进入人类与 AI 匿名基准；自定义关键词只作为练习。"}
-          </p>
+          {loading && (
+            <p className="mt-3 text-sm leading-6 text-ink-muted" aria-live="polite">
+              正在检索“{value?.label ?? normalizedInput}”…
+            </p>
+          )}
           <label className="mt-5 block text-sm font-semibold text-ink" htmlFor="career-stage">
-            你的阶段
+            你的职业阶段
           </label>
           <select
             id="career-stage"
