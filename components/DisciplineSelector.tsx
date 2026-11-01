@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { disciplines, type Discipline } from "@/config/disciplines";
 import { careerStages, type CareerStageId } from "@/lib/types";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 export type ResearchSelection =
@@ -53,7 +54,13 @@ export function DisciplineSelector({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-[1160px] items-center px-5 py-12 sm:px-8 lg:px-12">
+    <main className="relative mx-auto flex min-h-screen w-full max-w-[1160px] items-center px-5 py-12 sm:px-8 lg:px-12">
+      <Link
+        href="/about"
+        className="absolute right-5 top-6 text-sm font-semibold text-ink-muted underline decoration-ink/20 underline-offset-4 transition-colors hover:text-accent-strong sm:right-8 lg:right-12"
+      >
+        关于
+      </Link>
       <section className="grid w-full items-end gap-12 lg:grid-cols-[1fr_0.82fr] lg:gap-24">
         <div className="max-w-2xl">
           <div className="mb-12 flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.16em] text-ink-muted">

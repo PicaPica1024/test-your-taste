@@ -275,11 +275,11 @@ export function venueNamesForTier(
   tier: VenueTierId,
 ): string[] {
   if (tier === "flagship") {
-    return [
+    return [...new Set([
       ...(flagshipByPool[poolKey] ?? coreFlagships),
       ...(medicalPoolKeys.has(poolKey) ? medicalFlagships : []),
       ...(poolKey === "computer-science" ? topComputerConferenceNames : []),
-    ];
+    ])];
   }
 
   const prestigeTier =

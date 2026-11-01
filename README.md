@@ -6,6 +6,8 @@ Test Your Taste 会抽取一篇真实论文，先藏起作者、期刊或会议�
 
 [在线玩](https://test-your-taste.zhujiangqiu.chatgpt.site/)
 
+[查看游戏设计与逐学科期刊名录](https://test-your-taste.zhujiangqiu.chatgpt.site/about)
+
 ## 我理解的“科研品味”
 
 “科研品味”这个词被说得多了，听起来越来越玄乎。在我看来，它其实很朴素：**判断什么是好研究的能力。**
