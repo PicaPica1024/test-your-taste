@@ -7,7 +7,6 @@ export const metadata: Metadata = {
 };
 
 const updates = [
-  "相比第一版，第一题由猜抽象档次改为从五个具体的期刊或会议名称中选择。",
   "新版按照期刊的综合质量均匀分配论文抽取机会，再从对应范围内寻找论文。",
   "降低期刊发表数量差异带来的影响，避免游戏过度偏向高发文量期刊。",
 ] as const;
@@ -50,8 +49,7 @@ export default function AboutPage() {
 
         <section className="border-b border-ink/15 py-14">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent-strong">02 · 本次更新</p>
-          <h2 className="mt-3 max-w-3xl font-serif text-4xl leading-tight sm:text-5xl">相比第一版，让不同期刊获得更均衡的出现机会</h2>
-          <ol className="mt-8 border-y border-ink/15">
+          <ol className="mt-5 border-y border-ink/15">
             {updates.map((copy, index) => (
               <li key={copy} className="grid gap-3 border-b border-ink/15 py-6 last:border-b-0 sm:grid-cols-[3rem_1fr] sm:items-start">
                 <span className="font-serif text-3xl text-accent-strong">{index + 1}</span>
