@@ -60,10 +60,10 @@ export function DisciplineSelector({
             <span className="grid size-8 place-items-center border border-ink/20 font-serif text-base normal-case tracking-normal text-ink">
               T²
             </span>
-            科研判断力游戏
+            测测你的科研品味
           </div>
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-accent-strong">
-            先看研究，再看声望
+            想知道自己的科研品味吗？
           </p>
           <h1 className="font-serif text-[clamp(3.5rem,9vw,7.5rem)] leading-[0.82] tracking-[-0.055em] text-ink">
             Test Your
@@ -71,7 +71,7 @@ export function DisciplineSelector({
             Taste<span className="text-accent-strong">.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-ink-muted sm:text-xl">
-            隐去作者和来源，只看年份、标题与摘要，你能判断研究的发表档次和影响力吗？
+            英雄不问出处，隐去作者和期刊，仅凭发表年份，标题和摘要，你能判断出发表档次和影响力吗？
           </p>
         </div>
 
