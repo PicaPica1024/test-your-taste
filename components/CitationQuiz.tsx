@@ -14,7 +14,7 @@ export function CitationQuiz({ value, onChange, revealed, actual }: Props) {
     <section aria-labelledby="citation-question" className="py-12">
       <div className="mb-7 flex items-start gap-4">
         <span className="font-serif text-xl text-accent-strong">02</span>
-        <h2 id="citation-question" className="font-serif text-2xl text-ink sm:text-3xl">How many times has this paper been cited?</h2>
+        <h2 id="citation-question" className="font-serif text-2xl text-ink sm:text-3xl">这篇论文被引用了多少次？</h2>
       </div>
       <RadioGroup value={value ?? ""} onValueChange={(next) => onChange(next as CitationRangeId)} disabled={revealed} className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {citationRanges.map((range, index) => {

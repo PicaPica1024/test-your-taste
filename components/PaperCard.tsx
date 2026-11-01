@@ -13,7 +13,7 @@ export function PaperCard({ year, title, abstract }: Props) {
         </span>
         <span className="h-px flex-1 bg-ink/15" />
         <span className="text-xs font-semibold uppercase tracking-[0.15em] text-ink-muted">
-          Journal hidden
+          来源已隐藏
         </span>
       </div>
       <h1 className="max-w-[23ch] font-serif text-[clamp(2.35rem,5.5vw,4.8rem)] leading-[1.02] tracking-[-0.035em] text-ink">

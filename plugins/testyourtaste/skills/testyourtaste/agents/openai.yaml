@@ -1,7 +1,7 @@
 interface:
   display_name: "Test Your Taste"
-  short_description: "用关键词生成真实论文猜期刊与引用量游戏"
-  default_prompt: "使用 $testyourtaste 根据逗号分隔的关键词生成论文竞猜题。"
+  short_description: "看真实论文，猜发表档次与引用量"
+  default_prompt: "使用 $testyourtaste 按关键词开始科研品味竞猜；输入 help 查看说明，输入 ai 可让模型闭卷自测。"
 
 policy:
   allow_implicit_invocation: true

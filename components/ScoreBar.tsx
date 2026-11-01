@@ -3,11 +3,11 @@ import type { SessionStats } from "@/lib/types";
 
 export function ScoreBar({ stats }: { stats: SessionStats }) {
   const items = [
-    { label: "Score", value: `${stats.points} / ${stats.papersPlayed * 2}` },
-    { label: "Papers", value: String(stats.papersPlayed) },
-    { label: "Journal", value: `${percentage(stats.journalCorrect, stats.papersPlayed)}%` },
-    { label: "Citations", value: `${percentage(stats.citationCorrect, stats.papersPlayed)}%` },
-    { label: "Streak", value: String(stats.streak) },
+    { label: "得分", value: `${stats.points} / ${stats.papersPlayed * 2}` },
+    { label: "论文", value: String(stats.papersPlayed) },
+    { label: "档次", value: `${percentage(stats.venueCorrect, stats.papersPlayed)}%` },
+    { label: "引用量", value: `${percentage(stats.citationCorrect, stats.papersPlayed)}%` },
+    { label: "连胜", value: String(stats.streak) },
   ];
   return (
     <aside aria-label="Session score" className="grid grid-cols-2 gap-px border border-ink/15 bg-ink/15 sm:grid-cols-5">

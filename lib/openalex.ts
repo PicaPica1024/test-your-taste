@@ -5,6 +5,13 @@ type OpenAlexTopic = {
   subfield?: { id: string; display_name: string };
 };
 
+type OpenAlexSource = {
+  id: string;
+  display_name: string;
+  type: string;
+  works_count: number;
+};
+
 export type OpenAlexWork = {
   id: string;
   doi: string | null;
@@ -37,6 +44,17 @@ type ApiList<T> = { results?: T[] };
 
 const API = "https://api.openalex.org";
 const topicCache = new Map<string, OpenAlexTopic>();
+const sourceCache = new Map<string, OpenAlexSource | null>();
+
+function normalizeSourceName(name: string) {
+  return name
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/^the\s+/, "")
+    .replace(/&/g, "and")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
 
 export type OpenAlexErrorCode =
   | "OPENALEX_KEY_MISSING"
@@ -182,6 +200,109 @@ export function reconstructAbstract(index: Record<string, number[]> | null) {
     .trim();
 }
 
+async function resolveSource(name: string, signal?: AbortSignal) {
+  const cacheKey = normalizeSourceName(name);
+  if (sourceCache.has(cacheKey)) return sourceCache.get(cacheKey) ?? null;
+
+  const params = new URLSearchParams({
+    search: name,
+    "per-page": "10",
+    select: "id,display_name,type,works_count",
+  });
+  const payload = await openAlexFetch<ApiList<OpenAlexSource>>(
+    `/sources?${params}`,
+    signal,
+  );
+  const candidates = payload.results ?? [];
+  const exact = candidates.find(
+    (source) => normalizeSourceName(source.display_name) === cacheKey,
+  );
+  const source =
+    exact ??
+    candidates
+      .filter((candidate) => {
+        const normalized = normalizeSourceName(candidate.display_name);
+        return normalized.includes(cacheKey) || cacheKey.includes(normalized);
+      })
+      .sort((left, right) => right.works_count - left.works_count)[0] ??
+    null;
+  sourceCache.set(cacheKey, source);
+  return source;
+}
+
+function workSelect() {
+  return "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic";
+}
+
+async function sampleWorksFromSource(
+  topic: OpenAlexTopic | undefined,
+  source: OpenAlexSource,
+  citationFilter: string,
+  cutoffYear: number,
+  seed: number,
+  keyword: string | undefined,
+  signal?: AbortSignal,
+) {
+  const filter = [
+    ...(topic ? [`topics.id:${topic.id.split("/").pop()}`] : []),
+    `primary_location.source.id:${source.id.split("/").pop()}`,
+    "language:en|zh",
+    "has_abstract:true",
+    "type:article|review",
+    "from_publication_date:1990-01-01",
+    `to_publication_date:${cutoffYear}-12-31`,
+    `cited_by_count:${citationFilter}`,
+  ].join(",");
+  const params = new URLSearchParams({
+    filter,
+    sample: "25",
+    "per-page": "25",
+    seed: String(seed),
+    select: workSelect(),
+  });
+  if (keyword) params.set("search", keyword);
+  const payload = await openAlexFetch<ApiList<OpenAlexWork>>(
+    `/works?${params}`,
+    signal,
+  );
+  return payload.results ?? [];
+}
+
+function shuffled<T>(items: readonly T[]) {
+  const copy = [...items];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swapWith = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[swapWith]] = [copy[swapWith], copy[index]];
+  }
+  return copy;
+}
+
+export async function sampleWorksByVenueNames(
+  topic: OpenAlexTopic | undefined,
+  venueNames: string[],
+  citationFilter: string,
+  cutoffYear: number,
+  seed: number,
+  keyword?: string,
+  signal?: AbortSignal,
+) {
+  for (const name of shuffled(venueNames).slice(0, 12)) {
+    const source = await resolveSource(name, signal);
+    if (!source) continue;
+    const works = await sampleWorksFromSource(
+      topic,
+      source,
+      citationFilter,
+      cutoffYear,
+      seed,
+      keyword,
+      signal,
+    );
+    if (works.length) return works;
+  }
+  return [];
+}
+
 export async function sampleWorks(
   topic: OpenAlexTopic,
   citationFilter: string,
@@ -203,8 +324,7 @@ export async function sampleWorks(
     sample: "25",
     "per-page": "25",
     seed: String(seed),
-    select:
-      "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
+    select: workSelect(),
   });
   const payload = await openAlexFetch<ApiList<OpenAlexWork>>(
     `/works?${params}`,
@@ -232,8 +352,7 @@ export async function searchWorksByKeyword(
     filter,
     sort: "relevance_score:desc",
     per_page: "100",
-    select:
-      "id,doi,title,language,publication_year,cited_by_count,type,abstract_inverted_index,primary_location,topics,primary_topic",
+    select: workSelect(),
   });
   const payload = await openAlexFetch<ApiList<OpenAlexWork>>(
     `/works?${params}`,

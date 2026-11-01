@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { disciplines, type Discipline } from "@/config/disciplines";
+import { careerStages, type CareerStageId } from "@/lib/types";
 import { ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 export type ResearchSelection =
   | { kind: "discipline"; label: string; discipline: Discipline }
@@ -13,6 +14,8 @@ type Props = {
   value: ResearchSelection | null;
   onChange: (selection: ResearchSelection | null) => void;
   onStart: (selection: ResearchSelection) => void;
+  careerStage: CareerStageId;
+  onCareerStageChange: (stage: CareerStageId) => void;
   loading?: boolean;
 };
 
@@ -20,12 +23,11 @@ export function DisciplineSelector({
   value,
   onChange,
   onStart,
+  careerStage,
+  onCareerStageChange,
   loading = false,
 }: Props) {
   const [inputValue, setInputValue] = useState(value?.label ?? "");
-  useEffect(() => {
-    if (value) setInputValue(value.label);
-  }, [value]);
 
   const normalizedInput = inputValue.trim().replace(/\s+/g, " ");
   const resolvedSelection = useMemo<ResearchSelection | null>(() => {
@@ -58,10 +60,10 @@ export function DisciplineSelector({
             <span className="grid size-8 place-items-center border border-ink/20 font-serif text-base normal-case tracking-normal text-ink">
               T²
             </span>
-            Scientific judgment game
+            科研判断力游戏
           </div>
           <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-accent-strong">
-            Read first. Reputation later.
+            先看研究，再看声望
           </p>
           <h1 className="font-serif text-[clamp(3.5rem,9vw,7.5rem)] leading-[0.82] tracking-[-0.055em] text-ink">
             Test Your
@@ -69,17 +71,16 @@ export function DisciplineSelector({
             Taste<span className="text-accent-strong">.</span>
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-8 text-ink-muted sm:text-xl">
-            Can you recognize an influential paper before knowing where it was
-            published?
+            隐去作者和来源，只看年份、标题与摘要，你能判断研究的发表档次和影响力吗？
           </p>
         </div>
 
         <div className="border-t-2 border-ink pt-7 lg:mb-1">
           <p className="mb-8 max-w-md font-serif text-2xl leading-9 text-ink">
-            Read a real paper. Guess the journal. Guess its impact.
+            每五轮覆盖五个档次，顺序随机。猜发表档次，也猜引用量。
           </p>
           <label className="mb-3 block text-sm font-semibold text-ink" htmlFor="field-search">
-            Choose a field or enter keywords
+            选择学科或输入关键词
           </label>
           <form
             aria-busy={loading}
@@ -101,8 +102,8 @@ export function DisciplineSelector({
               maxLength={120}
               disabled={loading}
               autoComplete="off"
-              aria-label="Choose a research field or enter keywords"
-              placeholder="e.g. ecology or lake restoration"
+              aria-label="选择研究领域或输入关键词"
+              placeholder="例如：生态学、湖泊恢复"
               className="h-12 w-full border border-ink/25 bg-surface px-3 text-base text-ink outline-none transition-colors placeholder:text-ink-muted focus:border-accent-strong"
             />
             <datalist id="research-field-options">
@@ -118,18 +119,29 @@ export function DisciplineSelector({
               className="mt-4 h-12 w-full rounded-none bg-ink text-base text-paper hover:bg-accent-strong"
               disabled={!resolvedSelection || loading}
             >
-              {loading ? "Searching…" : "Start"}
+              {loading ? "正在找论文…" : "开始"}
               {!loading && <ArrowRight aria-hidden="true" />}
             </Button>
           </form>
           <p className="mt-3 text-sm leading-6 text-ink-muted" aria-live="polite">
             {loading
-              ? `Searching for “${value?.label ?? normalizedInput}”…`
-              : "Choose a suggestion, or keep your own keywords and press Start."}
+              ? `正在检索“${value?.label ?? normalizedInput}”…`
+              : "选择预设学科可进入人类与 AI 匿名基准；自定义关键词只作为练习。"}
           </p>
+          <label className="mt-5 block text-sm font-semibold text-ink" htmlFor="career-stage">
+            你的阶段
+          </label>
+          <select
+            id="career-stage"
+            value={careerStage}
+            onChange={(event) => onCareerStageChange(event.target.value as CareerStageId)}
+            disabled={loading}
+            className="mt-2 h-11 w-full border border-ink/25 bg-surface px-3 text-sm text-ink outline-none focus:border-accent-strong"
+          >
+            {careerStages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
+          </select>
           <p className="mt-4 text-sm leading-6 text-ink-muted">
-            English and Chinese papers only. Papers are selected from OpenAlex
-            and were published at least ten years ago.
+            只使用 OpenAlex 中的中文或英文论文，且论文至少发表十年。无需姓名、邮箱或账号。
           </p>
         </div>
       </section>
