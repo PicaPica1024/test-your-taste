@@ -145,7 +145,7 @@ export function DisciplineSelector({
             {careerStages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
           </select>
           <p className="mt-4 text-sm leading-6 text-ink-muted">
-            只使用 OpenAlex 中的中文或英文论文，且论文至少发表十年。无需姓名、邮箱或账号。
+            这个测试不会获得你的任何个人信息
           </p>
         </div>
       </section>
